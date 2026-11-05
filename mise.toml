@@ -56,12 +56,19 @@ import json
 import tomllib
 from pathlib import Path
 
-# Syntax only: these files are credential-free examples, not active
-# configuration, so nothing here reads a user's real agent settings.
+# Layer 1 of 3: syntax only. These files are credential-free examples, not
+# active configuration, so nothing here reads a user's real agent settings.
+#
+# Layer 2, CLI configuration validation, is manual on purpose: it starts a
+# harness (opencode debug config, codex doctor) in a throwaway home, which
+# writes local state and may fetch a model catalog. See
+# docs/reference/agent-configuration.md.
+# Layer 3, authenticated model execution, is never attempted here: it would
+# require credentials and would be billed.
 json.loads(Path("examples/agents/opencode.json").read_text(encoding="utf-8"))
 with Path("examples/agents/codex/ai-devkit-advanced.config.toml").open("rb") as handle:
     tomllib.load(handle)
-print("Agent configuration examples parse.")
+print("Agent configuration examples parse (syntax only).")
 PY
 """
 

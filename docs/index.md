@@ -61,7 +61,7 @@ mise install --locked          # install the pinned toolchain
 mise exec -- uv sync --locked  # create/update the Python environment
 mise run docs                  # build the site, fail on broken links
 mise run docs-serve            # preview at http://localhost:8000
-mise run examples-check        # parse the agent configuration examples
+mise run examples-check        # parse the agent examples (syntax only)
 mise run check                 # every check implemented so far
 ```
 

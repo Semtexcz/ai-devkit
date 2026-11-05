@@ -15,7 +15,8 @@ you have read the file.
 - You have your own DeepSeek API key and/or a ChatGPT account whose plan covers
   Codex.
 - The example files live in `examples/agents/`. They are inert: they are not
-  read by any tool until you copy them to the location named below.
+  read by any tool until you copy them, or their settings, to the location named
+  below.
 
 Credentials stay in each harness's own store. No example in this repository
 contains a key, and no key belongs in a file that Git tracks.
@@ -39,47 +40,94 @@ harness or changing its model explicitly — see
 
 ## Configure OpenCode with DeepSeek
 
-1. Check what already exists, then copy the example. OpenCode 1.19.5 creates
-   `~/.config/opencode/opencode.jsonc` the first time it runs, and in that
-   directory a `.jsonc` file wins over a `.json` file for conflicting keys.
+1. Look before you write. OpenCode 1.19.5 reads
+   `~/.config/opencode/opencode.json` or `opencode.jsonc`, and creates
+   `opencode.jsonc` the first time it runs.
 
    ```bash
-   ls ~/.config/opencode
-   mkdir -p ~/.config/opencode
-   cp examples/agents/opencode.json ~/.config/opencode/opencode.json
+   ls -a ~/.config/opencode
    ```
 
-   If `opencode.jsonc` already exists, add the two keys to that file and remove
-   the copy you just made — a `model` left in `opencode.json` would not take
-   effect. If `opencode.json` already existed, merge into it rather than
-   overwriting it.
+   | What you find | What to do |
+   |---|---|
+   | No file, or no directory | `mkdir -p ~/.config/opencode` and `cp examples/agents/opencode.json ~/.config/opencode/opencode.json` |
+   | `opencode.json` exists | Add the two keys to it by hand; keep every other key |
+   | `opencode.jsonc` exists | Add the two keys to that file; `.jsonc` wins over `.json` for conflicting keys, so keys added only to a sibling `opencode.json` would have no effect |
 
-2. Authenticate. Run OpenCode and use `/connect`, or run the provider command:
+   Merging means inserting two members into the object that is already there.
+   OpenCode's own first run writes just `{"$schema": ...}`, so that is the
+   smallest realistic result:
+
+   ```json
+   {
+     "$schema": "https://opencode.ai/config.json",
+     "model": "deepseek/deepseek-flash",
+     "small_model": "deepseek/deepseek-flash"
+   }
+   ```
+
+   Keep whatever else the file already contains. JSON has no trailing commas, so
+   a member appended after the last one needs a comma on the line above. If both
+   files exist, edit the `.jsonc` one.
+
+   This guide never overwrites an existing OpenCode configuration file. When in
+   doubt, add the two keys by hand instead of copying.
+
+   Editing the user file respects OpenCode's merge order instead of fighting it:
+   the user file is the default for every project, a project `opencode.json`
+   overrides only the keys it names, and `OPENCODE_CONFIG` or
+   `OPENCODE_CONFIG_CONTENT`, if you export them, outrank the user file. Do not
+   set either variable to force a choice. The full order is in the
+   [agent configuration reference](../reference/agent-configuration.md).
+
+2. Authenticate. Inside the OpenCode interface use `/connect`, or log in from the
+   shell:
 
    ```bash
-   opencode providers login
+   opencode auth login
    ```
 
-   The key is stored in `~/.local/share/opencode/auth.json`, not in your config
-   file. As an alternative, export `DEEPSEEK_API_KEY` and OpenCode reads it from
-   the environment.
+   `auth` is the command name in 1.19.5; `providers` is an alias for the same
+   command. Add `--provider deepseek` to skip the provider picker. The key is
+   stored in `~/.local/share/opencode/auth.json`, not in your config file. As an
+   alternative, export `DEEPSEEK_API_KEY` and OpenCode reads it from the
+   environment.
 
-3. Verify that the provider and models are visible:
+3. Check the credential and the model catalog separately, because they answer
+   different questions and either can fail on its own:
 
    ```bash
-   opencode models deepseek
+   opencode auth list        # which providers have a stored credential
+   opencode models deepseek  # which model identifiers this build resolves
    ```
 
-   Expected output:
+   `opencode auth list` is the authentication check. It reads the local
+   credential store and names the file it uses together with the providers
+   configured in it; it sends no request. `opencode models deepseek` is the
+   catalog check and prints the identifiers:
 
    ```text
    deepseek/deepseek-flash
    deepseek/deepseek-v4-pro
    ```
 
-   A `Provider not found: deepseek` error means that shell has no DeepSeek
-   credential: either the `/connect` step did not complete, or
-   `DEEPSEEK_API_KEY` is not exported in this shell.
+   That is the expected output once a DeepSeek credential is present. A model
+   list is not an authentication check: in this release a provider appears only
+   when a credential for it exists, so `Provider not found: deepseek` means "no
+   DeepSeek credential in this shell" — either `opencode auth login` did not
+   complete, or `DEEPSEEK_API_KEY` is not exported here.
+
+4. Confirm what is actually in force:
+
+   ```bash
+   opencode debug config
+   ```
+
+   The document it prints is the merged result, so `"model":
+   "deepseek/deepseek-flash"` and `"small_model": "deepseek/deepseek-flash"` must
+   appear in it; a key missing there is not in force. To test a candidate file
+   before touching your own configuration, use the throwaway-home recipe in
+   [Troubleshoot agent setup](troubleshoot-agent-setup.md).
 
 The example sets two keys and nothing else:
 
@@ -141,12 +189,18 @@ keeps the key). If a later release removes it, delete the key — the explicit
 ### Add the advanced profile
 
 ```bash
+ls ~/.codex/ai-devkit-advanced.config.toml   # "No such file" is the normal case
+mkdir -p ~/.codex
 cp examples/agents/codex/ai-devkit-advanced.config.toml \
   ~/.codex/ai-devkit-advanced.config.toml
 
 codex --profile ai-devkit-advanced
 codex exec --profile ai-devkit-advanced "review the current diff"
 ```
+
+Do not copy over a profile that already exists: edit the existing file instead.
+Because a profile is layered over `~/.codex/config.toml`, it only needs the keys
+that differ.
 
 A profile is a separate file next to the user config, holding top-level keys
 that are layered over `~/.codex/config.toml`. Since Codex 0.134.0 the
@@ -157,6 +211,13 @@ runtime commands only; `codex doctor` and `codex debug` reject it.
 The example sets `approval_policy = "on-request"` and
 `sandbox_mode = "workspace-write"`. It deliberately sets no `model`: available
 models depend on your account, so the account-supported default stays in effect.
+
+The pinned release accepts both keys: with them placed in a temporary
+`CODEX_HOME/config.toml`, `codex doctor` reports `config loaded` and
+`approval OnRequest`. `codex doctor` exits 0 even when a check fails, so read its
+`Configuration` rows rather than the exit status. Profile resolution itself is
+exercised only by runtime commands, which need a signed-in account, so it stays
+documented here rather than separately validated.
 
 ### Override the Codex model or sandbox
 

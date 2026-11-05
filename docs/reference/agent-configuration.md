@@ -86,6 +86,7 @@ harnesses, not a devkit policy.
 | Per-run override | `-m provider/model` | `-m <model>`, `-c model=<model>` | Per-task model choice in the interface |
 | Interactive switch | `/models` | `/model` in the session | Model dropdown |
 | Identifier check | `opencode models [provider]` | `codex debug models` | Model dropdown |
+| Credential check | `opencode auth list` | `codex login status` | Provider settings panel |
 | Provider selection | Credential plus `provider/model` | `model_provider` in user config | API Provider dropdown |
 
 OpenCode resolves the model to use in this order: the `-m` flag, then `model`
@@ -116,7 +117,7 @@ shared engineering rules name none.
 
 | Harness | Native storage | Environment alternative | Written by |
 |---|---|---|---|
-| OpenCode | `~/.local/share/opencode/auth.json` | `DEEPSEEK_API_KEY` | `/connect`, `opencode providers login` |
+| OpenCode | `~/.local/share/opencode/auth.json` | `DEEPSEEK_API_KEY` | `/connect`, `opencode auth login` |
 | Codex CLI | `~/.codex/auth.json`, or the OS credential store chosen by `cli_auth_credentials_store` | `OPENAI_API_KEY`, which means API billing | `codex login` |
 | Cline | `~/.cline/data/settings/providers.json` | Not documented | The Cline settings interface |
 
@@ -179,14 +180,35 @@ Explicitly unverified, and not claimed:
 
 ## Verification commands
 
-| Command | Checks |
+Three layers answer three different questions. Only the first is automated, and
+none of them is evidence of an authenticated session.
+
+| Layer | Command | What it proves | Needs credentials |
+|---|---|---|---|
+| Syntax | `mise run examples-check` | The shipped JSON and TOML examples parse | No |
+| CLI configuration | `opencode debug config` and `codex doctor` with a throwaway home | The pinned release loads and accepts the shipped keys | No |
+| Authenticated execution | `opencode run "..."`, `codex exec "..."` | A real model request completes and is billed | Yes — not tested here |
+
+`mise run examples-check` deliberately stays a standard-library parse: it is
+fast, offline, deterministic and never reads or writes a user configuration.
+Starting a harness is a separate manual step, because it creates local state and
+may fetch the model catalog.
+
+The throwaway-home recipe for both harnesses is in
+[Troubleshoot agent setup](../how-to/troubleshoot-agent-setup.md).
+
+| Command | Reads |
 |---|---|
-| `mise run examples-check` | The shipped examples parse as JSON and TOML |
-| `mise run versions` | The installed harness versions match the pins |
+| `mise run examples-check` | The example files in this repository |
+| `mise run versions` | The installed harness versions, for comparison with the pins |
+| `opencode auth list` | The local credential store and the providers configured in it |
+| `opencode models [provider]` | The model catalog the build resolves; a provider appears only when it has a credential |
 | `opencode debug config` | The merged OpenCode configuration for the current directory |
+| `codex login status` | Which Codex authentication method is active |
 | `codex doctor` | Codex configuration, authentication and runtime state |
 
-All four read configuration or local state. None is evidence of an authenticated
-run, and none is reported as one: see
+All of these read configuration or local state and send no model request. Codex
+Doctor reports a failing check in its rows and still exits 0, so read the rows
+rather than the exit status. See
 [Troubleshoot agent setup](../how-to/troubleshoot-agent-setup.md) for isolated
 diagnosis.

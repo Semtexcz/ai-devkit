@@ -13,7 +13,8 @@ You need:
 
 - Linux x86-64. This is the only verified platform.
 - Git, to clone the repository.
-- `curl`, `tar` and CA certificates, to download and unpack the tools.
+- `curl`, `tar`, `sha256sum` from coreutils, and CA certificates, to download,
+  verify and unpack the tools.
 - A user account that can write to `~/.local`. No `sudo` is required at any
   point.
 
@@ -23,6 +24,7 @@ Check the basics:
 git --version
 curl --version
 tar --version
+sha256sum --version
 ```
 
 mise is not assumed to be installed already: Step 1 clones the repository and
@@ -45,32 +47,73 @@ The toolchain is defined by mise, so mise itself is installed first. Use the
 official release archive for the pinned release instead of a moving "latest"
 installer, and check the published checksum before running the binary.
 
-The download runs in a disposable directory inside a subshell, so your shell
-stays in the repository root for the updated environment and for every later
-step.
+The block below is ordered so that a failure cannot be followed by an install.
+The installation is a single subshell that stops at its first error, and its
+exit status decides whether anything after it runs: the archive is unpacked in a
+temporary directory and moved into place only after the checksum and the
+unpacked binary check out, an `EXIT` trap removes the temporary directory
+whether the attempt succeeds or fails, and an existing installation is refused
+rather than overwritten. The subshell also keeps your shell in the repository
+root, and the last lines export `PATH` so every later command finds the new
+binary.
 
 ```bash
 MISE_VERSION=2026.11.1
-mkdir -p ~/.local/opt ~/.local/bin
-work="$(mktemp -d)"
+mise_root="$HOME/.local/opt/mise"
+mise_bin="$HOME/.local/bin/mise"
+mkdir -p "$HOME/.local/opt" "$HOME/.local/bin"
+
 (
-  cd "$work" || exit 1
-  curl -fsSLO "https://github.com/jdx/mise/releases/download/v$MISE_VERSION/mise-v$MISE_VERSION-linux-x64.tar.gz"
-  curl -fsSLO "https://github.com/jdx/mise/releases/download/v$MISE_VERSION/SHASUMS256.txt"
-  sha256sum -c <(grep "mise-v$MISE_VERSION-linux-x64.tar.gz" SHASUMS256.txt)
-  tar -xzf "mise-v$MISE_VERSION-linux-x64.tar.gz" -C ~/.local/opt
+  set -eu                        # stop at the first failing step
+  for path in "$mise_root" "$mise_bin"; do
+    if [ -e "$path" ] || [ -L "$path" ]; then
+      echo "ERROR: $path already exists; refusing to overwrite it" >&2
+      exit 1
+    fi
+  done
+  work="$(mktemp -d)"
+  trap 'rm -rf "$work"' EXIT     # cleanup after success and after failure
+  cd "$work"
+  base="https://github.com/jdx/mise/releases/download/v$MISE_VERSION"
+  archive="mise-v$MISE_VERSION-linux-x64.tar.gz"
+  curl -fsSLO "$base/$archive"
+  curl -fsSLO "$base/SHASUMS256.txt"
+  grep -F "$archive" SHASUMS256.txt > expected.sha256
+  sha256sum -c expected.sha256   # a mismatch stops here, before extraction
+  tar -xzf "$archive"            # unpacks into the temporary directory
+  test -x "$work/mise/bin/mise"  # the archive must contain the binary
+  mv "$work/mise" "$mise_root"   # first step that touches the install path
+  ln -s ../opt/mise/bin/mise "$mise_bin"
 )
-rm -rf "$work"
-ln -sfn ../opt/mise/bin/mise ~/.local/bin/mise
-pwd          # must print the repository root
-mise --version
+mise_status=$?                   # 0 only if every step above succeeded
+
+if [ "$mise_status" -eq 0 ]; then
+  export PATH="$HOME/.local/bin:$PATH"
+  hash -r                        # forget a previously resolved mise
+  pwd                            # must print the repository root
+  command -v mise                # must print $HOME/.local/bin/mise
+  mise --version                 # must print 2026.11.1
+else
+  echo "ERROR: mise was not installed; fix the error above." >&2
+  echo "If $mise_root exists, remove it before retrying." >&2
+fi
 ```
 
 The checksum line must end with `OK`, `pwd` must still print the repository
-root, and `mise --version` must print `2026.11.1`. `~/.local/bin` already needs
-to be on your `PATH`; for this session, prefix commands with
-`PATH="$HOME/.local/bin:$PATH"` if it is not. If mise is still not found after
-that, open a new shell before continuing.
+root, `command -v mise` must print `$HOME/.local/bin/mise`, and
+`mise --version` must print `2026.11.1`.
+
+If the block prints `ERROR: mise was not installed`, nothing was installed: the
+subshell stopped at the failing step, the temporary directory was removed, and
+neither install path was created. Fix the reported cause — a failed download, a
+checksum mismatch or an unusable archive — and run the block again.
+
+`ERROR: ... already exists` appears just above that line when an earlier
+installation was found; it was left untouched. Remove `~/.local/opt/mise` and
+`~/.local/bin/mise` yourself only if you do intend to replace them.
+
+The `export PATH` above applies to the current shell. A new shell needs
+`~/.local/bin` on its `PATH` from your shell profile.
 
 ## Step 3: Review and trust the project configuration
 

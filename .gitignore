@@ -16,5 +16,6 @@ node_modules/
 
 # Generated documentation output
 site/
+.cache/
 
 # Kept on purpose: uv.lock, mise.lock, AGENTS.md, docs, OpenSpec, skills.

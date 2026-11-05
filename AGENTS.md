@@ -25,8 +25,25 @@ Portable: no host-specific paths, no required agent, model or provider. See
 - Prefer deterministic testing and validation.
 - Keep documentation synchronized with implementation.
 - Never report unexecuted checks as passed.
-- `mise run check` is a **planned** verification interface for generated projects;
-  it does not exist in this repository yet.
+- Run `mise run check` before reporting a task complete; it currently runs the
+  checks that exist at this stage.
+
+## Toolchain and checks
+
+- mise owns runtimes and CLI versions; uv owns the Python environment and its
+  dependencies. Neither concern gets a second owner.
+- `mise.toml`, `pyproject.toml` and the committed lockfiles are the sources of
+  truth. Never hand-edit `mise.lock`, `.mise/locks/**` or `uv.lock`; regenerate
+  with `mise lock` or `uv lock` and review the diff.
+- Run tools through mise (`mise exec -- uv ...`, `mise run <task>`) so pinned
+  versions and `UV_NO_MANAGED_PYTHON=1` apply.
+- Do not add a `.python-version` file; mise selects the interpreter.
+- Tasks: `docs` (strict build), `docs-serve`, `lock-check`, `check`, `versions`.
+  Add checks to `check` only when the capability genuinely exists.
+- Documentation follows Diátaxis under `docs/` and builds with `--strict`, so a
+  broken internal link fails the build.
+- Linux x86-64 is the only verified platform. Do not claim macOS, WSL2 or
+  clean-machine support without evidence.
 
 ## Definition of Done
 

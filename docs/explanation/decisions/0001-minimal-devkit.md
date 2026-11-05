@@ -39,8 +39,9 @@ and a minimal project overlay, not a development framework.
 13. The devkit must support future compatible agents and providers without
     restructuring shared engineering standards.
 
-These are decisions, not implemented integrations: only the four Task 1 files
-exist.
+These are decisions about ownership, not a claim about implementation status;
+the [toolchain reference](../../reference/tool-versions.md) records what is
+implemented and verified today.
 
 ## Consequences
 

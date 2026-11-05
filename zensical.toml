@@ -1,0 +1,47 @@
+[project]
+site_name = "ai-devkit"
+site_description = "A portable, versioned development toolchain and engineering standards for small Python projects built with coding agents."
+site_author = "ai-devkit maintainers"
+docs_dir = "docs"
+site_dir = "site"
+
+# Fail the build when link validation reports a problem. `mise run docs` also
+# passes --strict so the check does not depend on this setting alone.
+strict = true
+
+nav = [
+  { "Home" = "index.md" },
+  { "Tutorials" = [
+    { "Getting started" = "tutorials/getting-started.md" },
+  ] },
+  { "How-to guides" = [
+    { "Install the development toolchain" = "how-to/install-toolchain.md" },
+  ] },
+  { "Reference" = [
+    { "Tool ownership and pinned versions" = "reference/tool-versions.md" },
+  ] },
+  { "Explanation" = [
+    { "Reproducibility and Python ownership" = "explanation/reproducibility.md" },
+    { "ADR 0001: minimal configuration-first devkit" = "explanation/decisions/0001-minimal-devkit.md" },
+    { "ai-devkit v0.1 implementation plan" = "plans/ai-devkit-v0.1.md" },
+  ] },
+]
+
+[project.theme]
+language = "en"
+features = [
+  "navigation.sections",
+  "navigation.indexes",
+  "navigation.top",
+  "navigation.footer",
+  "navigation.tracking",
+  "content.code.copy",
+  "search.highlight",
+]
+
+[project.markdown_extensions]
+admonition = {}
+attr_list = {}
+def_list = {}
+footnotes = {}
+toc.permalink = true

@@ -1,0 +1,25 @@
+[project]
+name = "ai-devkit"
+# Not published; the version only satisfies the `[project]` metadata contract.
+version = "0.1.0"
+description = "Development tooling for ai-devkit itself: documentation build and verification."
+requires-python = ">=3.13"
+dependencies = []
+
+# Development tooling only. ai-devkit is not a Python package, so there is no
+# build backend and nothing is built or published.
+[dependency-groups]
+dev = [
+  "copier~=9.19.1",
+  "mypy~=2.4.1",
+  "pytest~=9.2.0",
+  "ruff~=0.17.3",
+  "zensical~=0.0.74",
+]
+
+[tool.uv]
+package = false
+# mise owns Python. uv must not download an interpreter of its own and must not
+# prefer a uv-managed one over the interpreter mise puts on PATH.
+python-preference = "only-system"
+python-downloads = "never"

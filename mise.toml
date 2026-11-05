@@ -1,0 +1,70 @@
+# ai-devkit toolchain.
+#
+# mise owns runtimes (Python, Node.js) and command-line tools, and records the
+# resolved versions, checksums and download URLs in mise.lock.
+# uv owns the Python project's virtual environment and python dependencies,
+# which are locked in uv.lock.
+#
+# Install with:  mise install --locked
+# Sync Python:   mise exec -- uv sync --locked
+
+min_version = "2026.11.1"
+
+[settings]
+# mise.lock records artifacts for the acceptance platform only.
+# Add platforms here (for example "macos-arm64") before relying on the same
+# lockfile elsewhere; see docs/reference/tool-versions.md.
+lockfile_platforms = ["linux-x64"]
+
+[env]
+# Python has exactly one owner: mise. uv must never download or prefer a
+# separate managed interpreter. The same constraints are set for uv itself in
+# pyproject.toml ([tool.uv] python-preference / python-downloads).
+UV_NO_MANAGED_PYTHON = "1"
+
+[tools]
+# Runtime lines from the v0.1 plan: Python 3.13, Node.js 24.
+python = "3.13.18"
+node = "24.22.2"
+
+# CLIs. Backends are pinned explicitly so a registry change cannot silently
+# move a tool to a different distribution channel.
+"aqua:astral-sh/uv" = "0.13.7"
+"npm:@fission-ai/openspec" = "1.16.0"
+# OpenCode 1 (the line whose DeepSeek integration the plan targets) from the
+# vendor's GitHub releases, as documented at https://opencode.ai/docs/.
+"github:anomalyco/opencode" = "1.19.5"
+"aqua:openai/codex" = "0.163.0"
+
+[tasks.docs]
+description = "Build the documentation site; fails on broken internal links"
+run = "uv run --locked zensical build --strict"
+
+[tasks.docs-serve]
+description = "Preview the documentation site locally with live reload"
+run = "uv run --locked zensical serve"
+
+[tasks."lock-check"]
+description = "Verify that uv.lock is consistent with pyproject.toml"
+run = "uv lock --check"
+
+[tasks.check]
+description = "Run every check implemented so far (locked dependencies, strict docs build)"
+depends = ["lock-check", "docs"]
+
+[tasks.versions]
+description = "Print the installed toolchain versions for verification"
+run = """
+echo "== mise";              mise --version
+echo "== python";            python --version
+echo "== node";              node --version
+echo "== uv";                uv --version
+echo "== openspec";          openspec version
+echo "== opencode";          opencode --version
+echo "== codex";             codex --version
+echo "== copier";            uv run --locked copier --version
+echo "== pytest";            uv run --locked pytest --version
+echo "== ruff";              uv run --locked ruff --version
+echo "== mypy";              uv run --locked mypy --version
+echo "== zensical";          uv run --locked zensical --version
+"""

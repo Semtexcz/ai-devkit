@@ -188,19 +188,38 @@ keeps the key). If a later release removes it, delete the key — the explicit
 
 ### Add the advanced profile
 
-```bash
-ls ~/.codex/ai-devkit-advanced.config.toml   # "No such file" is the normal case
-mkdir -p ~/.codex
-cp examples/agents/codex/ai-devkit-advanced.config.toml \
-  ~/.codex/ai-devkit-advanced.config.toml
+Copy the example only when you have no profile at that path yet. Paste the whole
+block: it writes nothing when the destination already exists, whether it is a
+regular file or a symbolic link.
 
+```bash
+target="$HOME/.codex/ai-devkit-advanced.config.toml"
+
+if [ -e "$target" ] || [ -L "$target" ]; then
+  ls -l "$target"          # a symlink prints as name -> target
+  printf 'Exists: %s\nNothing copied.\n' "$target"
+else
+  mkdir -p "$(dirname "$target")"
+  cp examples/agents/codex/ai-devkit-advanced.config.toml "$target"
+  printf 'Copied the example to %s\n' "$target"
+fi
+```
+
+`-e` is false for a symbolic link whose target is missing, so `-L` is tested as
+well: a dangling link still counts as an existing profile and is left untouched.
+
+If the block reports that the file exists, do not replace it. Read
+`examples/agents/codex/ai-devkit-advanced.config.toml`, then merge the settings
+you want into the existing file by hand and keep every setting it already has.
+Because a profile is layered over `~/.codex/config.toml`, it only needs the keys
+that differ.
+
+Then select the profile:
+
+```bash
 codex --profile ai-devkit-advanced
 codex exec --profile ai-devkit-advanced "review the current diff"
 ```
-
-Do not copy over a profile that already exists: edit the existing file instead.
-Because a profile is layered over `~/.codex/config.toml`, it only needs the keys
-that differ.
 
 A profile is a separate file next to the user config, holding top-level keys
 that are layered over `~/.codex/config.toml`. Since Codex 0.134.0 the

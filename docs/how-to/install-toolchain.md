@@ -38,11 +38,21 @@ That task prints mise, Python, Node.js, uv, OpenSpec, OpenCode, Codex and each
 Python development tool. Compare the output with the pinned versions in the
 [reference](../reference/tool-versions.md).
 
-Also confirm that uv did not acquire its own interpreter:
+Also confirm that uv did not acquire its own interpreter. Ask mise which
+interpreter it selects, then compare it with the one the environment uses; the
+comparison assumes no fixed mise installation directory:
 
 ```bash
-readlink -f .venv/bin/python    # must point into ~/.local/share/mise/installs/python/
+mise which python
+readlink -f .venv/bin/python
+[ "$(readlink -f .venv/bin/python)" = "$(readlink -f "$(mise which python)")" ] \
+  && echo "OK: uv uses the mise-selected interpreter"
 ```
+
+The comparison must print `OK`. `mise which` reports the path inside whatever
+data directory the current mise uses, so the check assumes no fixed location —
+it holds when `MISE_DATA_DIR` is set, as long as the toolchain is installed in
+that data directory.
 
 Each tool can also be invoked directly, which is useful when a global install
 of the same name exists on your `PATH`:
@@ -86,16 +96,64 @@ mise run check
 ## Roll back to a known working configuration
 
 Lockfiles are committed, so rollback is a Git operation followed by a
-re-install:
+re-install. Two situations need different commands: discarding edits you have
+not committed yet, and returning to a version that was committed earlier.
+
+Inspect the state first, so you know which situation applies:
 
 ```bash
-git checkout -- mise.toml mise.lock .mise/locks pyproject.toml uv.lock
+git status --short
+git diff -- mise.toml mise.lock .mise/locks pyproject.toml uv.lock
+```
+
+### Discard uncommitted edits
+
+This is not a rollback to an earlier release; it throws the edits away and
+returns the files to the last commit, whether the edits were staged or not.
+They are unrecoverable afterwards, so review the diff above first.
+
+```bash
+git restore --source=HEAD --staged --worktree -- \
+  mise.toml mise.lock .mise/locks pyproject.toml uv.lock
+```
+
+Files Git does not track — for example a sidecar directory you generated but
+never added — are left alone; `git status --short` lists them with `??`.
+
+### Restore a previously committed, known-good version
+
+Find the commit whose toolchain you want back, then read those paths out of it.
+The contents land in your working tree as uncommitted changes; nothing is
+rewritten in history and your current commit stays intact.
+
+```bash
+git log --oneline -- mise.toml mise.lock
+COMMIT=abc1234          # replace with the commit, tag or branch you chose
+git restore --source="$COMMIT" --worktree -- \
+  mise.toml mise.lock .mise/locks pyproject.toml uv.lock
+git diff --stat
+```
+
+Review `git diff` and commit the result once you accept it, so the next
+rollback starts from a known point.
+
+`git restore` only touches the paths you name. A path that is tracked but does
+not exist in that commit is removed from the working tree, so `.mise/locks/`
+cannot end up holding two sidecar versions. A path you never committed stays
+untracked and therefore remains; `git status --short` lists it with `??`, and
+you should remove it before re-installing so the tree holds one toolchain
+version.
+
+### Re-install and verify either way
+
+```bash
 mise install --locked
 mise exec -- uv sync --locked
 mise run check
 ```
 
-Then confirm that verification changed no tracked file:
+Then confirm that verification changed no tracked file, other than the rollback
+itself:
 
 ```bash
 git status --short

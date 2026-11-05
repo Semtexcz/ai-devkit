@@ -78,14 +78,20 @@ mise owns Python; uv must use the interpreter mise selected.
 | uv cannot prefer a managed one | `python-preference = "only-system"` in `pyproject.toml` |
 | No second version file exists | there is no `.python-version`; `mise.toml` is authoritative |
 
-Verify the identity of the interpreter rather than the version string:
+Verify the identity of the interpreter rather than the version string. Compare
+the interpreter mise selects with the one the environment uses, so the check
+does not depend on mise's installation directory:
 
 ```bash
 mise which python                                  # mise-selected interpreter
-mise exec -- python -c 'import sys; print(sys.executable)'
-readlink -f .venv/bin/python                       # must resolve into the mise install
+readlink -f .venv/bin/python                       # interpreter the venv uses
+[ "$(readlink -f .venv/bin/python)" = "$(readlink -f "$(mise which python)")" ] \
+  && echo "OK: uv uses the mise-selected interpreter"
 mise exec -- uv run python -c 'import sys; print(sys.executable)'
 ```
+
+The comparison must print `OK`; `mise which` reflects the active mise data
+directory, so no fixed install path is assumed.
 
 ## Tasks
 

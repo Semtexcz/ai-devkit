@@ -55,11 +55,18 @@ No `.python-version` file exists, so `mise.toml` is the only statement of the
 required interpreter. A second version file would be a second owner, and the two
 would eventually disagree.
 
-Verification therefore compares executable paths, not version strings:
+Verification therefore compares executable paths, not version strings, and takes
+the expected interpreter from mise instead of a hard-coded install directory:
 
 ```bash
-readlink -f .venv/bin/python   # must resolve into ~/.local/share/mise/installs/python/
+mise which python
+readlink -f .venv/bin/python
+[ "$(readlink -f .venv/bin/python)" = "$(readlink -f "$(mise which python)")" ] \
+  && echo "OK: uv uses the mise-selected interpreter"
 ```
+
+The comparison must print `OK`; it fails visibly if uv ever used another
+interpreter, and it assumes no fixed mise install path.
 
 ## What is reproducible, and what is not
 

@@ -39,8 +39,27 @@ Portable: no host-specific paths, no required agent, model or provider. See
   versions and `UV_NO_MANAGED_PYTHON=1` apply.
 - Do not add a `.python-version` file; mise selects the interpreter.
 - Tasks: `docs` (strict build), `docs-serve`, `lock-check`, `examples-check`,
-  `check`, `versions`. Add checks to `check` only when the capability genuinely
-  exists.
+  `test-template`, `check`, `versions`. Add checks to `check` only when the
+  capability genuinely exists.
+- `mise run test-template` is the generation integration test. It needs the package
+  index and is therefore kept out of `check`; run both before reporting a change
+  that touches the overlay.
+
+## Project overlay boundary
+
+- `copier.yml` and `templates/python-script-overlay/template/` are the only template
+  source; `_subdirectory` keeps the rest of the repository out of rendered projects.
+- The overlay owns policy: rules, checker configuration, documentation seeds and
+  ignore rules. It must never render `main.py`, `pyproject.toml`, `uv.lock` or
+  `.python-version`, because uv and the project developer own those files.
+- Copier provenance is `.copier-answers.yml`, rendered by the template. Never add a
+  devkit-specific version table or a custom update command.
+- Do not add Copier tasks that execute commands, and do not patch application code
+  from the template. The `def main() -> None:` annotation is a documented
+  project-owned edit; see
+  [ADR 0002](docs/explanation/decisions/0002-script-project-overlay.md).
+- Never create, move or push ai-devkit release tags from an automated change. The
+  integration test uses a temporary tagged repository.
 - Documentation follows Diátaxis under `docs/` and builds with `--strict`, so a
   broken internal link fails the build.
 - Linux x86-64 is the only verified platform. Do not claim macOS, WSL2 or

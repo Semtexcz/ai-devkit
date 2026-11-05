@@ -1,0 +1,31 @@
+# ai-devkit Copier overlay: shared engineering standards and documentation for an
+# unpackaged Python script project.
+#
+# The generated project is created by native `uv init` first; this overlay is
+# applied second. The overlay never renders application code, `pyproject.toml`,
+# `uv.lock` or `.python-version`, because uv and the project developer own those
+# files. See docs/explanation/generated-project-ownership.md.
+#
+# `_subdirectory` keeps the devkit's own files (documentation, toolchain
+# configuration, tests) out of the rendered project: Copier renders only
+# templates/python-script-overlay/template/. This also makes the repository root a
+# valid Copier template source, which is what records provenance (`_src_path` +
+# `_commit`) for `copier update`.
+#
+# Usage, documented in docs/tutorials/first-python-project.md:
+#   copier copy --vcs-ref <tag> gh:Semtexcz/ai-devkit "<destination>"
+
+_subdirectory: templates/python-script-overlay/template
+_min_copier_version: "9.0.0"
+
+project_name:
+  type: str
+  help: >-
+    Name used in the project's documentation and documentation site title. It does
+    not rename anything: `pyproject.toml` and `main.py` belong to uv and the project.
+  default: "{{ _copier_conf.dst_path.name }}"
+
+project_description:
+  type: str
+  help: One sentence describing what the script does.
+  default: "A small Python script project."

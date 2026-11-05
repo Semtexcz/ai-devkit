@@ -13,20 +13,25 @@ nav = [
   { "Home" = "index.md" },
   { "Tutorials" = [
     { "Getting started" = "tutorials/getting-started.md" },
+    { "Create your first Python project" = "tutorials/first-python-project.md" },
   ] },
   { "How-to guides" = [
     { "Install the development toolchain" = "how-to/install-toolchain.md" },
     { "Configure coding agents" = "how-to/configure-coding-agents.md" },
     { "Troubleshoot agent setup" = "how-to/troubleshoot-agent-setup.md" },
+    { "Update a project's overlay" = "how-to/update-project-overlay.md" },
   ] },
   { "Reference" = [
     { "Tool ownership and pinned versions" = "reference/tool-versions.md" },
+    { "Generated project: commands and contents" = "reference/generated-project.md" },
     { "Agent configuration" = "reference/agent-configuration.md" },
   ] },
   { "Explanation" = [
     { "Reproducibility and Python ownership" = "explanation/reproducibility.md" },
+    { "Who owns which file in a generated project" = "explanation/generated-project-ownership.md" },
     { "Why agent configuration stays native" = "explanation/agent-independence.md" },
     { "ADR 0001: minimal configuration-first devkit" = "explanation/decisions/0001-minimal-devkit.md" },
+    { "ADR 0002: script project overlay" = "explanation/decisions/0002-script-project-overlay.md" },
     { "ai-devkit v0.1 implementation plan" = "plans/ai-devkit-v0.1.md" },
   ] },
 ]

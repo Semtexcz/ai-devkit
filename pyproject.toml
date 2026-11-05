@@ -23,3 +23,9 @@ package = false
 # prefer a uv-managed one over the interpreter mise puts on PATH.
 python-preference = "only-system"
 python-downloads = "never"
+
+[tool.pytest.ini_options]
+# The generation test lives in tests/. Without this, a plain `pytest` run would
+# also collect templates/python-script-overlay/template/tests/test_main.py, which
+# is a smoke test for generated projects, not for this repository.
+testpaths = ["tests"]

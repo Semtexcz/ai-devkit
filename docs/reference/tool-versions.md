@@ -100,9 +100,24 @@ directory, so no fixed install path is assumed.
 | `mise run docs` | `uv run --locked zensical build --strict` |
 | `mise run docs-serve` | `uv run --locked zensical serve` |
 | `mise run check` | `mise run lock-check`, `mise run examples-check`, then `mise run docs` |
+| `mise run test-template` | `uv run --locked pytest tests/` — the project generation integration test |
 | `mise run lock-check` | `uv lock --check` |
 | `mise run examples-check` | parses the JSON and TOML agent configuration examples |
 | `mise run versions` | prints every pinned version |
 
-`check` deliberately contains only the checks that exist today. Ruff, mypy,
-pytest and OpenSpec checks arrive with the application and OpenSpec tasks.
+`check` deliberately contains only the checks that exist for this repository.
+OpenSpec validation arrives with the OpenSpec task. `test-template` is kept
+separate because it installs a project's own dependencies from the package index;
+CI is expected to run both.
+
+## Project overlay
+
+| Artifact | Contents |
+|---|---|
+| `copier.yml` | template settings (`_subdirectory`) and the two documentation questions |
+| `templates/python-script-overlay/template/` | the rendered overlay: `AGENTS.md`, `mise.toml`, `ruff.toml`, `mypy.ini`, `pytest.ini`, `zensical.toml`, `README.md`, `docs/`, `tests/`, `.gitignore`, `.copier-answers.yml` |
+| `tests/test_template.py` | generation integration test behind `mise run test-template` |
+
+The overlay never renders `main.py`, `pyproject.toml`, `uv.lock` or
+`.python-version`. The full reference is
+[Generated project: commands and contents](generated-project.md).

@@ -224,11 +224,13 @@ mise run check
 
 At this stage `check` verifies that `uv.lock` matches `pyproject.toml`, that the
 agent configuration examples parse, and that the documentation builds strictly.
-Application linting, type checking, tests and OpenSpec validation arrive with
-later tasks.
+Ruff, mypy and pytest run inside generated projects, not in this repository's own
+`check`; project creation is verified separately by
+`mise run test-template`. OpenSpec validation arrives with a later task.
 
-You now have a reproducible maintainer environment. To change versions safely,
-read [Install the development toolchain](../how-to/install-toolchain.md); to
+You now have a reproducible maintainer environment. To create a project in it, read
+[Create your first Python project](first-python-project.md). To change versions
+safely, read [Install the development toolchain](../how-to/install-toolchain.md); to
 understand why the toolchain is split between mise and uv, read
 [Reproducibility and Python ownership](../explanation/reproducibility.md). To put
 a coding agent to work on top of it, read

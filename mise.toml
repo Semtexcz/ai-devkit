@@ -76,6 +76,13 @@ PY
 description = "Run every check implemented so far (locked dependencies, agent examples, strict docs build)"
 depends = ["lock-check", "examples-check", "docs"]
 
+[tasks."test-template"]
+description = "Create a Python script project with native uv and Copier, then verify it end to end"
+# Deliberately separate from `check`: this test installs the project's own
+# dependencies and needs the package index, so it is the slower integration gate.
+# CI runs both; see docs/reference/generated-project.md.
+run = "uv run --locked pytest tests/"
+
 [tasks.versions]
 description = "Print the installed toolchain versions for verification"
 run = """

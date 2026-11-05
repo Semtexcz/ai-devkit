@@ -99,8 +99,9 @@ directory, so no fixed install path is assumed.
 |---|---|
 | `mise run docs` | `uv run --locked zensical build --strict` |
 | `mise run docs-serve` | `uv run --locked zensical serve` |
-| `mise run check` | `mise run lock-check` then `mise run docs` |
+| `mise run check` | `mise run lock-check`, `mise run examples-check`, then `mise run docs` |
 | `mise run lock-check` | `uv lock --check` |
+| `mise run examples-check` | parses the JSON and TOML agent configuration examples |
 | `mise run versions` | prints every pinned version |
 
 `check` deliberately contains only the checks that exist today. Ruff, mypy,

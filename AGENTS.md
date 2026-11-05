@@ -38,12 +38,25 @@ Portable: no host-specific paths, no required agent, model or provider. See
 - Run tools through mise (`mise exec -- uv ...`, `mise run <task>`) so pinned
   versions and `UV_NO_MANAGED_PYTHON=1` apply.
 - Do not add a `.python-version` file; mise selects the interpreter.
-- Tasks: `docs` (strict build), `docs-serve`, `lock-check`, `check`, `versions`.
-  Add checks to `check` only when the capability genuinely exists.
+- Tasks: `docs` (strict build), `docs-serve`, `lock-check`, `examples-check`,
+  `check`, `versions`. Add checks to `check` only when the capability genuinely
+  exists.
 - Documentation follows Diátaxis under `docs/` and builds with `--strict`, so a
   broken internal link fails the build.
 - Linux x86-64 is the only verified platform. Do not claim macOS, WSL2 or
   clean-machine support without evidence.
+
+## Agent configuration
+
+- Harness, provider, model, execution profile, role and orchestrator are separate
+  concepts. Each harness keeps its own native configuration and credential store.
+- Model names, account-dependent defaults and credentials are user-level
+  configuration. They never become shared engineering rules, because a shared rule
+  must outlive the account and the release that made it convenient.
+- Configuration examples under `examples/agents/` are credential-free and inert.
+  The devkit documents and configures harnesses; it does not launch, route or
+  authenticate them.
+- See the [agent configuration reference](docs/reference/agent-configuration.md).
 
 ## Definition of Done
 

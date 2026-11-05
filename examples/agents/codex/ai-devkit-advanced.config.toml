@@ -1,0 +1,19 @@
+# Codex CLI profile: advanced planning and review.
+#
+# Copy to $CODEX_HOME/ai-devkit-advanced.config.toml (normally
+# ~/.codex/ai-devkit-advanced.config.toml) and select it with
+#   codex --profile ai-devkit-advanced
+#
+# The profile holds top-level keys only; it is layered over
+# $CODEX_HOME/config.toml, so it lists just the values that differ.
+#
+# No credential and no model are set. `model` is account-dependent: leave it out
+# to use the model your signed-in account supports by default, and override it
+# per run with `-m <model>` or `-c model=<model>`.
+
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# For review-only sessions, sandbox_mode = "read-only" is the narrower choice.
+# `codex exec` is non-interactive and never asks for approval, so approval_policy
+# affects interactive sessions only.

@@ -48,9 +48,26 @@ run = "uv run --locked zensical serve"
 description = "Verify that uv.lock is consistent with pyproject.toml"
 run = "uv lock --check"
 
+[tasks."examples-check"]
+description = "Parse the agent configuration examples (JSON and TOML) with the standard library"
+run = """
+python - <<'PY'
+import json
+import tomllib
+from pathlib import Path
+
+# Syntax only: these files are credential-free examples, not active
+# configuration, so nothing here reads a user's real agent settings.
+json.loads(Path("examples/agents/opencode.json").read_text(encoding="utf-8"))
+with Path("examples/agents/codex/ai-devkit-advanced.config.toml").open("rb") as handle:
+    tomllib.load(handle)
+print("Agent configuration examples parse.")
+PY
+"""
+
 [tasks.check]
-description = "Run every check implemented so far (locked dependencies, strict docs build)"
-depends = ["lock-check", "docs"]
+description = "Run every check implemented so far (locked dependencies, agent examples, strict docs build)"
+depends = ["lock-check", "examples-check", "docs"]
 
 [tasks.versions]
 description = "Print the installed toolchain versions for verification"

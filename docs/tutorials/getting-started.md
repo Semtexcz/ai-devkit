@@ -103,10 +103,27 @@ The checksum line must end with `OK`, `pwd` must still print the repository
 root, `command -v mise` must print `$HOME/.local/bin/mise`, and
 `mise --version` must print `2026.11.1`.
 
-If the block prints `ERROR: mise was not installed`, nothing was installed: the
-subshell stopped at the failing step, the temporary directory was removed, and
-neither install path was created. Fix the reported cause — a failed download, a
-checksum mismatch or an unusable archive — and run the block again.
+If the block prints `ERROR: mise was not installed`, the subshell stopped at the
+failing step and the temporary directory was removed. What is left on disk
+depends on where it stopped:
+
+- A failure before the archive is moved into place — a download error, a checksum
+  mismatch or an unusable archive — leaves nothing installed: neither
+  `~/.local/opt/mise` nor `~/.local/bin/mise` exists.
+- `mv` is the first step that writes to the install path, and the symlink is
+  created after it. If `mv` succeeds and `ln -s` fails, `~/.local/opt/mise`
+  exists while `~/.local/bin/mise` does not.
+
+That second case is a partial installation, not an empty one: the binary is
+already in place and only the `PATH` entry is missing, and the next run refuses
+to overwrite the directory on purpose. Fix the reported cause, then either
+complete the partial installation
+
+```bash
+ln -s ../opt/mise/bin/mise "$HOME/.local/bin/mise"
+```
+
+or remove `~/.local/opt/mise` and run the block again.
 
 `ERROR: ... already exists` appears just above that line when an earlier
 installation was found; it was left untouched. Remove `~/.local/opt/mise` and
@@ -205,11 +222,14 @@ mise run docs-serve   # http://localhost:8000
 mise run check
 ```
 
-At this stage `check` verifies that `uv.lock` matches `pyproject.toml` and that
-the documentation builds strictly. Application linting, type checking, tests
-and OpenSpec validation arrive with later tasks.
+At this stage `check` verifies that `uv.lock` matches `pyproject.toml`, that the
+agent configuration examples parse, and that the documentation builds strictly.
+Application linting, type checking, tests and OpenSpec validation arrive with
+later tasks.
 
 You now have a reproducible maintainer environment. To change versions safely,
 read [Install the development toolchain](../how-to/install-toolchain.md); to
 understand why the toolchain is split between mise and uv, read
-[Reproducibility and Python ownership](../explanation/reproducibility.md).
+[Reproducibility and Python ownership](../explanation/reproducibility.md). To put
+a coding agent to work on top of it, read
+[Configure coding agents](../how-to/configure-coding-agents.md).

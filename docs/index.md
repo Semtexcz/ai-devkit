@@ -15,12 +15,17 @@ Implemented and verified in this repository:
 - the engineering contract in `AGENTS.md` and the
   [architecture decision record](explanation/decisions/0001-minimal-devkit.md);
 - a pinned, lockfile-based development toolchain (**Task 2**);
+- credential-free configuration examples for OpenCode, the Codex CLI and Cline
+  (**Task 3**);
 - a Zensical documentation build with strict internal-link validation.
 
 Planned, not implemented: Copier project generation, OpenSpec initialization,
-agent model configuration, project test infrastructure and CI. The
-[v0.1 plan](plans/ai-devkit-v0.1.md) owns that backlog; nothing here claims
-those parts work.
+project test infrastructure and CI. The
+[v0.1 plan](plans/ai-devkit-v0.1.md) owns that backlog; nothing here claims those
+parts work.
+
+Agent configuration is documented, not automated: this repository ships examples
+and instructions, and each harness keeps its own credentials.
 
 ## Documentation map
 
@@ -41,6 +46,13 @@ Repository records that are not tutorial content:
 - [ADR 0001](explanation/decisions/0001-minimal-devkit.md) — why the devkit is
   configuration-first.
 - [ai-devkit v0.1 plan](plans/ai-devkit-v0.1.md) — approved scope and backlog.
+- `examples/agents/` — credential-free OpenCode and Codex configuration
+  examples, inert until copied.
+
+Working with a coding agent starts with
+[Configure coding agents](how-to/configure-coding-agents.md); exact file
+locations, precedence and verified capabilities are in the
+[agent configuration reference](reference/agent-configuration.md).
 
 ## Common commands
 
@@ -49,6 +61,7 @@ mise install --locked          # install the pinned toolchain
 mise exec -- uv sync --locked  # create/update the Python environment
 mise run docs                  # build the site, fail on broken links
 mise run docs-serve            # preview at http://localhost:8000
+mise run examples-check        # parse the agent configuration examples
 mise run check                 # every check implemented so far
 ```
 

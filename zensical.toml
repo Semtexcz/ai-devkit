@@ -16,12 +16,16 @@ nav = [
   ] },
   { "How-to guides" = [
     { "Install the development toolchain" = "how-to/install-toolchain.md" },
+    { "Configure coding agents" = "how-to/configure-coding-agents.md" },
+    { "Troubleshoot agent setup" = "how-to/troubleshoot-agent-setup.md" },
   ] },
   { "Reference" = [
     { "Tool ownership and pinned versions" = "reference/tool-versions.md" },
+    { "Agent configuration" = "reference/agent-configuration.md" },
   ] },
   { "Explanation" = [
     { "Reproducibility and Python ownership" = "explanation/reproducibility.md" },
+    { "Why agent configuration stays native" = "explanation/agent-independence.md" },
     { "ADR 0001: minimal configuration-first devkit" = "explanation/decisions/0001-minimal-devkit.md" },
     { "ai-devkit v0.1 implementation plan" = "plans/ai-devkit-v0.1.md" },
   ] },

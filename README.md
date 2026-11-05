@@ -18,7 +18,7 @@ Custom code is the last resort.
 
 ## Status
 
-Implemented and verified on Linux x86-64 (Tasks 1–2 of the
+Implemented and verified on Linux x86-64 (Tasks 1–3 of the
 [approved implementation plan](docs/plans/ai-devkit-v0.1.md)):
 
 - an engineering contract in `AGENTS.md` and an architecture decision record;
@@ -27,12 +27,17 @@ Implemented and verified on Linux x86-64 (Tasks 1–2 of the
   `mise.lock`, with npm sidecar locks under `.mise/locks/`;
 - a locked Python development environment (Copier, pytest, Ruff, mypy, Zensical)
   managed by uv in `pyproject.toml` and `uv.lock`;
+- credential-free native configuration examples and setup documentation for
+  OpenCode with DeepSeek, the Codex CLI with ChatGPT authentication, and optional
+  Cline — documented, validated against the pinned CLIs, and replaceable;
 - a Zensical documentation site with strict internal-link validation, exposed as
   `mise run docs`, `mise run docs-serve` and `mise run check`.
 
-Not implemented yet: the Copier overlay, OpenSpec initialization, agent
-model/provider configuration, application code and tests, and CI. Nothing else
-is claimed to work.
+Not implemented yet: the Copier overlay, OpenSpec initialization, application
+code and tests, and CI. Nothing else is claimed to work.
+
+Agent configuration is native to each harness, so no model or provider is a
+dependency of the devkit, and no check makes a paid model request.
 
 ## Quick start
 
@@ -71,8 +76,10 @@ step-by-step version, including checksum verification.
 | Initial scaffold | native `uv init` | planned |
 | Standards/docs overlay | Copier | pinned, overlay planned |
 | Specs and change checklists | OpenSpec | pinned, initialization planned |
-| Routine coding | OpenCode + DeepSeek | pinned, configuration planned |
-| Advanced coding | Codex CLI + ChatGPT auth | pinned, configuration planned |
+| Routine coding | OpenCode + DeepSeek | configured, example only |
+| Advanced coding | Codex CLI + ChatGPT auth | configured, profile example |
+| Optional agent | Cline + DeepSeek | documented, interface-driven |
+| Agent configuration | each harness, natively | documented, not automated |
 | Agent instructions | AGENTS.md | implemented |
 | CI | GitHub Actions | planned |
 
@@ -97,8 +104,12 @@ The documentation site uses Diátaxis and is built with Zensical
 
 - [Getting started](docs/tutorials/getting-started.md) — install the toolchain and build the docs.
 - [Install the development toolchain](docs/how-to/install-toolchain.md) — install, update, roll back.
+- [Configure coding agents](docs/how-to/configure-coding-agents.md) — OpenCode with DeepSeek, Codex with ChatGPT, optional Cline.
+- [Troubleshoot agent setup](docs/how-to/troubleshoot-agent-setup.md) — missing credentials, rejected model identifiers.
 - [Tool ownership and pinned versions](docs/reference/tool-versions.md) — the tested version tuple.
+- [Agent configuration](docs/reference/agent-configuration.md) — locations, precedence, credentials, verified capabilities.
 - [Reproducibility and Python ownership](docs/explanation/reproducibility.md) — why mise and uv are separate.
+- [Why agent configuration stays native](docs/explanation/agent-independence.md) — no router, separate billing paths.
 - [ADR 0001](docs/explanation/decisions/0001-minimal-devkit.md) — design rationale.
 - [ai-devkit v0.1 plan](docs/plans/ai-devkit-v0.1.md) — scope and backlog.
 - [AGENTS.md](AGENTS.md) — engineering rules for agents and humans.

@@ -1,7 +1,28 @@
+{%- macro toml_string(value) -%}
+{#- Render a TOML basic string from a user-supplied answer. The answer is data,
+    not template source, so every character that would end the string or break
+    the document is escaped: backslash, double quote, the whitespace escapes,
+    the whole C0 control range and DEL. Nothing is forbidden; ordinary
+    punctuation, quotes, backslashes, Unicode and newlines all round-trip. -#}
+{%- set escapes = namespace(text=value
+      | replace('\\', '\\\\')
+      | replace('"', '\\"')
+      | replace('\n', '\\n')
+      | replace('\r', '\\r')
+      | replace('\t', '\\t')) -%}
+{%- for code in range(0, 32) -%}
+{%- if code not in (9, 10, 13) -%}
+{%- set escapes.text = escapes.text | replace('%c' % code, '\\u%04X' % code) -%}
+{%- endif -%}
+{%- endfor -%}
+{%- set escapes.text = escapes.text | replace('\x7f', '\\u007F') -%}
+"{{ escapes.text }}"
+{%- endmacro -%}
+
 [project]
-site_name = "{{ project_name }}"
-site_description = "{{ project_description }}"
-site_author = "{{ project_name }} maintainers"
+site_name = {{ toml_string(project_name) }}
+site_description = {{ toml_string(project_description) }}
+site_author = {{ toml_string(project_name ~ ' maintainers') }}
 docs_dir = "docs"
 site_dir = "site"
 

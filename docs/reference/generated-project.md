@@ -118,12 +118,29 @@ asserts:
 2. `main.py` and `pyproject.toml` are byte-identical to the uv output after the
    overlay is applied, and no template file could render them;
 3. the exact dependency versions are recorded in `pyproject.toml` and `uv.lock`;
-4. provenance is recorded, including a tag from a temporary tagged repository;
-5. the project is independent: its own `.venv`, its own `uv.lock`, no
-   `.python-version`, no workspace membership, no agent configuration;
-6. a deliberately broken test and a lint violation each make `mise run check` fail,
+4. native `mise lock` writes the project's own `mise.lock`; it records exactly the
+   Python and uv versions pinned by the rendered `mise.toml`, with a checksum and
+   a download URL for `linux-x64`, and it is not a copy of this repository's
+   `mise.lock`;
+5. `mise install --locked` installs that lockfile into a throwaway mise
+   installation whose data, cache and state directories live inside the fixture,
+   and `mise run check` passes with those freshly installed tools;
+6. provenance is recorded, including a tag from a temporary tagged repository;
+7. the project is independent: its own `.venv`, its own `uv.lock` and
+   `mise.lock`, no `.python-version`, no workspace membership, no agent
+   configuration;
+8. a deliberately broken test and a lint violation each make `mise run check` fail,
    and the fixture is restored afterwards;
-7. the devkit working tree is unchanged by the run.
+9. Copier answers containing double quotes, backslashes, Unicode and newlines
+   render a `zensical.toml` that `tomllib` parses back to the original answers, so
+   no punctuation has to be forbidden in a project name or description;
+10. the devkit working tree is unchanged by the run.
+
+The overlay never copies this repository's `mise.lock` into a project. A lock
+describes the platform it was created on, so the generated project runs
+`mise lock` once and commits the result; the split between the two lockfiles is
+[Reproducibility](../explanation/reproducibility.md).
 
 `test-template` is not part of `mise run check`: it installs packages from the
-package index and is the slower integration gate. CI is expected to run both.
+package index, downloads the locked toolchain archives and is the slower
+integration gate. CI is expected to run both.

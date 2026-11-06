@@ -42,6 +42,10 @@ nav = [
     { "ADR 0002: script project overlay" = "explanation/decisions/0002-script-project-overlay.md" },
     { "ai-devkit v0.1 implementation plan" = "plans/ai-devkit-v0.1.md" },
   ] },
+  { "Releases" = [
+    { "v0.1.0 release candidate" = "releases/v0.1.0.md" },
+    { "v0.1.0 acceptance report" = "releases/v0.1.0-acceptance-report.md" },
+  ] },
 ]
 
 [project.theme]

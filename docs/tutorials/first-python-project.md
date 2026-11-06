@@ -26,6 +26,10 @@ You need:
 - A parent directory where the project can live, outside the ai-devkit checkout.
   Spaces in the path are fine and are covered by the integration test.
 
+No system Python is needed. Every Python command below runs through
+`mise exec -- python`, which uses the interpreter mise installed; a Linux machine
+without `python3` on `PATH` is a supported starting point.
+
 Every command starts from the ai-devkit checkout unless it says otherwise.
 
 ## Step 1: create the application with native `uv init`
@@ -123,7 +127,7 @@ def main():
 Add the return annotation to `main.py`:
 
 ```bash
-python3 - <<'PY'
+mise exec -- python - <<'PY'
 from pathlib import Path
 
 path = Path("main.py")
@@ -132,6 +136,9 @@ assert "def main():\n" in text, "the uv scaffold changed; review this edit"
 path.write_text(text.replace("def main():\n", "def main() -> None:\n", 1), encoding="utf-8")
 PY
 ```
+
+`mise exec --` supplies the interpreter here: on a machine whose only Python comes
+from mise, there is no `python3` on `PATH`, and a bare `python3` would fail.
 
 The result:
 

@@ -174,7 +174,8 @@ git status --short
 - `mise.lock` records artifacts for `linux-x64` only, as declared by
   `lockfile_platforms` in `mise.toml`. On another platform, add it there and
   re-run `mise lock`; the resulting entry is untested until someone runs it.
-- macOS and WSL2 are not verified. Task 7 of the plan owns clean-machine
-  evidence.
+- macOS and WSL2 are not verified. Clean-machine evidence for Linux x86-64 is
+  recorded in the
+  [v0.1.0 acceptance report](../releases/v0.1.0-acceptance-report.md).
 - mise itself is installed manually and is not covered by `mise.lock`; the
   tested version is recorded in the reference.

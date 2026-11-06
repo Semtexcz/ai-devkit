@@ -29,10 +29,12 @@ Implemented and verified in this repository:
   (**Task 6**);
 - a Zensical documentation build with strict internal-link validation.
 
-Planned, not implemented: clean-machine validation (**Task 7**). The
-[v0.1 plan](plans/ai-devkit-v0.1.md) owns that backlog; nothing here claims those
-parts work. Hosted CI has not been observed on GitHub yet, so its status is
-**pending** — the workflow's contents are tested, its execution is not.
+Clean-machine acceptance (**Task 7**) replays the same journey on a disposable
+Ubuntu 24.04.5 x86-64 machine; the evidence is in the
+[v0.1.0 acceptance report](releases/v0.1.0-acceptance-report.md). Hosted CI runs
+green on the reviewed commit. The two live agent acceptance tests need a
+user-authorised authenticated session, so they are **pending**, and v0.1.0 is a
+[release candidate](releases/v0.1.0.md) rather than an accepted release.
 
 Agent configuration is documented, not automated: this repository ships examples
 and instructions, and each harness keeps its own credentials.
@@ -79,6 +81,10 @@ Repository records that are not tutorial content:
 - `examples/openspec-change/` — the worked example the tutorial and the integration
   test both use.
 - `openspec/` — this repository's own specifications and change history.
+- [v0.1.0 release candidate](releases/v0.1.0.md) — scope, limitations, deferred work
+  and the intended tagged-release procedure.
+- [v0.1.0 acceptance report](releases/v0.1.0-acceptance-report.md) — the evidence
+  behind every acceptance claim, including what is still pending.
 
 Working with a coding agent starts with
 [Configure coding agents](how-to/configure-coding-agents.md); exact file

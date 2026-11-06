@@ -55,9 +55,12 @@ Implemented and verified on Linux x86-64 (Tasks 1–6 of the
 - a Zensical documentation site with strict internal-link validation, exposed as
   `mise run docs`, `mise run docs-serve` and `mise run check`.
 
-Not implemented yet: clean-machine validation (Task 7). Hosted CI has not been
-observed on GitHub yet, so its status is **pending**, not passed; the workflow's
-properties are covered by tests, its execution is not.
+Task 7 replays the documented installation and project-creation journey on a
+disposable Ubuntu 24.04.5 x86-64 machine and records the evidence in the
+[v0.1.0 acceptance report](docs/releases/v0.1.0-acceptance-report.md). Hosted CI has
+run green on the reviewed commit. The two live agent acceptance tests still need a
+user-authorised authenticated session, so they are reported as **pending** and v0.1.0
+remains a release candidate: see the [v0.1.0 release notes](docs/releases/v0.1.0.md).
 
 Agent configuration is native to each harness, so no model or provider is a
 dependency of the devkit, and no check makes a paid model request.
@@ -106,7 +109,7 @@ step-by-step version, including checksum verification.
 | Optional agent | Cline + DeepSeek | documented, interface-driven |
 | Agent configuration | each harness, natively | documented, not automated |
 | Agent instructions | AGENTS.md | implemented |
-| CI | GitHub Actions | implemented (Task 6), hosted run pending |
+| CI | GitHub Actions | implemented; hosted run green on `685f041` |
 
 ## Initial focus
 
@@ -150,4 +153,6 @@ The documentation site uses Diátaxis and is built with Zensical
 - [ADR 0001](docs/explanation/decisions/0001-minimal-devkit.md) — design rationale.
 - [ADR 0002](docs/explanation/decisions/0002-script-project-overlay.md) — overlay scope and provenance.
 - [ai-devkit v0.1 plan](docs/plans/ai-devkit-v0.1.md) — scope and backlog.
+- [v0.1.0 release candidate](docs/releases/v0.1.0.md) — what v0.1 delivers, what is deferred, how a tag would be created.
+- [v0.1.0 acceptance report](docs/releases/v0.1.0-acceptance-report.md) — per-scenario evidence, environments and pending live tests.
 - [AGENTS.md](AGENTS.md) — engineering rules for agents and humans.

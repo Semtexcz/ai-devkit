@@ -222,11 +222,17 @@ mise run docs-serve   # http://localhost:8000
 mise run check
 ```
 
-At this stage `check` verifies that `uv.lock` matches `pyproject.toml`, that the
-agent configuration examples parse, and that the documentation builds strictly.
+`check` runs four tasks, in order:
+
+```text
+lock-check      uv lock --check
+examples-check  parse the agent configuration examples with the standard library
+spec-check      openspec validate --all --strict --no-interactive
+docs            zensical build --strict
+```
+
 Ruff, mypy and pytest run inside generated projects, not in this repository's own
-`check`; project creation is verified separately by
-`mise run test-template`. OpenSpec validation arrives with a later task.
+`check`; project creation is verified separately by `mise run test-template`.
 
 You now have a reproducible maintainer environment. To create a project in it, read
 [Create your first Python project](first-python-project.md). To change versions

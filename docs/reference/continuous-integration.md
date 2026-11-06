@@ -102,10 +102,11 @@ The individual assertions of `mise run test-template` are listed in
 
 ## Known limitations
 
-- **Hosted execution is not verified locally.** The tests in this repository check
-  the workflow's contents, not its behavior on a GitHub-hosted runner. Hosted
-  status is reported separately and only after GitHub runs it; a green local run
-  is not evidence about hosted CI.
+- **Hosted evidence is separate from local checks.** The tests in this repository
+  check the workflow's contents, not its behavior on a GitHub-hosted runner. Which
+  hosted runs have actually passed is recorded in the
+  [v0.1.0 acceptance report](../releases/v0.1.0-acceptance-report.md); a green local
+  run is still not evidence about hosted CI.
 - **One platform.** `ubuntu-24.04` on x86-64 only, matching `lockfile_platforms` in
   `mise.toml`. macOS, Windows and WSL2 are not covered and not claimed.
 - **The job needs the package index.** `mise run test-template` installs a generated

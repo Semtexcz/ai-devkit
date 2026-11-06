@@ -111,16 +111,55 @@ git ls-files --unmerged AGENTS.md  # stages 1, 2 and 3: base, ours, theirs
    git commit -am "chore: apply overlay update to v0.2.0"
    ```
 
-If an update goes wrong, discard it and start again:
-
-```bash
-git checkout .
-git status --short      # must print nothing
-```
-
 `copier recopy` is the fallback when the diff cannot be applied at all. It rewrites
 overlay files from the template and keeps your answers, so review the result as if
 it were a fresh overlay — it discards local edits to overlay files.
+
+## Discard the whole update
+
+Resolving is the default, because the update is a reviewable diff and its conflicts
+carry information. Abandon the update instead when the diff itself is the problem: a
+wrong `--vcs-ref`, a template that moved further than the project can follow, or a
+`recopy` you did not want. The procedure below returns the project to the commit it
+was on before the update started.
+
+`git checkout .` does not do that. A conflicting update leaves the file in Git's
+unmerged state (`UU AGENTS.md`), and `git checkout .` refuses to touch an unmerged
+path: it reports an error and leaves the conflict exactly where it was. Restore the
+committed state instead:
+
+```bash
+git restore --source=HEAD --staged --worktree .
+git status --short
+```
+
+`--source=HEAD` writes the committed content to both the working tree and the index,
+which clears the unmerged stages, so Git stops reporting the file as conflicted.
+
+!!! warning "This abandons every uncommitted change to tracked files"
+
+    `git restore --source=HEAD --staged --worktree .` **discards all uncommitted
+    changes to tracked files**, including changes you staged before the update and
+    never committed. Nothing it drops can be recovered from the working tree or the
+    index. Run it only when you intentionally want to abandon the entire update, and
+    only in a repository whose tracked files were clean and committed before the
+    update started; commit or stash anything you want to keep first.
+
+Untracked files are a separate matter: this command does not necessarily remove
+them. Copier writes new overlay files without adding them to the index, so they
+appear as `??` entries and survive the restore. Read `git status --short` afterwards
+and review each remaining `??` path by hand, removing the ones the discarded update
+created and keeping the ones you added yourself. Do not reach for `git clean -fd`,
+`git reset --hard` or any other automated cleanup: those delete paths nobody has
+looked at, including files that were never part of the update.
+
+Confirm the tree matches the commit before you retry:
+
+```bash
+git status --short        # only reviewed "??" entries may remain
+git diff HEAD --stat      # must print nothing
+git ls-files --unmerged   # must print nothing: no unmerged stages left
+```
 
 ## Troubleshooting
 
@@ -134,9 +173,10 @@ files across.
 Commit or stash first: Copier applies a diff and needs a known baseline.
 
 A `.rej` file next to an overlay file means the patch was rejected and the inline
-merge did not complete. Restore the tree with `git checkout .` and run the update
-again; if it repeats, the template and the project have diverged too far for a diff,
-so resolve it with `copier recopy` and reapply your edits by hand.
+merge did not complete. Discard the update as described in
+[Discard the whole update](#discard-the-whole-update) and run it again; if it
+repeats, the template and the project have diverged too far for a diff, so resolve it
+with `copier recopy` and reapply your edits by hand.
 
 ## Verify afterwards
 

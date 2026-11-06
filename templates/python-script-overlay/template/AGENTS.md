@@ -17,14 +17,38 @@ dependency only when it removes more code than it adds, and record it with
 
 | Concern | Owner |
 |---|---|
-| Python interpreter, uv and other tool versions, tasks | `mise.toml` |
+| Python interpreter, uv, Node.js and OpenSpec versions, tasks | `mise.toml` |
 | `pyproject.toml`, `uv.lock`, `.venv/`, `main.py` | uv and this project |
 | `AGENTS.md`, checker configuration, documentation seeds | the Copier overlay |
+| `openspec/` specifications and proposed changes | OpenSpec, driven by this project |
+| `.opencode/`, `.agents/` integration files | OpenSpec's `init` and `update` commands |
 | Application behavior | you |
 
 Work through mise so the pinned versions apply: `mise run <task>` or
 `mise exec -- uv ...`. Do not add a `.python-version` file; `mise.toml` is the
 single statement of the required interpreter.
+
+Never hand-write OpenSpec's own integration files and never copy them from another
+project: `openspec init` created them, `openspec update` refreshes them, and a
+hand-edited copy silently diverges from the pinned CLI.
+
+## Working with a change
+
+OpenSpec owns behavioral requirements and change task lists. `AGENTS.md` owns
+engineering rules, and `docs/explanation/` owns rationale. A change is proposed
+before it is implemented:
+
+```bash
+openspec new change <name>       # or the harness command: /opsx-propose
+openspec validate <name> --strict --no-interactive
+openspec status --change <name>
+```
+
+`openspec/changes/<name>/` holds the proposal, the spec delta and the task list;
+`openspec/specs/` holds what the project already promised. Mark a task complete in
+`tasks.md` only when the work it describes is done and verified, and archive the
+change with `openspec archive <name>` once it is accepted. There is no second
+backlog: do not add a task file outside `openspec/`.
 
 ## Small, testable changes
 
@@ -63,6 +87,10 @@ A change is complete when:
 ## Verify
 
 `mise run check` is the canonical verification command. It runs the locked
-dependency check, Ruff lint and format check, `mypy --strict`, pytest and the
-strict documentation build. See `docs/reference/commands.md` for the individual
-tasks.
+dependency check, Ruff lint and format check, `mypy --strict`, pytest, the strict
+documentation build and native OpenSpec validation. See
+`docs/reference/commands.md` for the individual tasks.
+
+OpenSpec must be initialized before the check runs: `openspec validate` fails when
+the project has no `openspec/` root. Initialization is a one-time step,
+`openspec init --tools opencode,codex --profile core`.

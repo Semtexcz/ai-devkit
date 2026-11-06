@@ -18,7 +18,7 @@ Custom code is the last resort.
 
 ## Status
 
-Implemented and verified on Linux x86-64 (Tasks 1–4 of the
+Implemented and verified on Linux x86-64 (Tasks 1–5 of the
 [approved implementation plan](docs/plans/ai-devkit-v0.1.md)):
 
 - an engineering contract in `AGENTS.md` and two architecture decision records;
@@ -34,14 +34,21 @@ Implemented and verified on Linux x86-64 (Tasks 1–4 of the
   project: engineering rules, mise tasks, Ruff/mypy/pytest configuration, Diátaxis
   documentation and ignore rules. It never renders application code,
   `pyproject.toml`, `uv.lock` or `.python-version`;
+- OpenSpec initialized natively with `openspec init --tools opencode,codex --profile
+  core`: `openspec/specs/` holds one real behavioral specification, and OpenSpec's own
+  OpenCode and Codex integrations live in `.opencode/` and `.agents/`;
+- `mise run check` includes the native `openspec validate --all --strict
+  --no-interactive`, and a generated project's check runs the same command;
 - a generation integration test (`mise run test-template`) that creates a project
-  with spaces in its path, installs the exact baseline dependencies, runs the
-  application and its smoke test, and fails on deliberately broken checks;
+  with spaces in its path, installs the exact baseline dependencies, initializes
+  OpenSpec with the project's own pinned CLI, runs the application and its smoke
+  test, proves an invalid specification fails the check, and executes one complete
+  change lifecycle from `examples/openspec-change/`;
 - a Zensical documentation site with strict internal-link validation, exposed as
   `mise run docs`, `mise run docs-serve` and `mise run check`.
 
-Not implemented yet: OpenSpec initialization, CI, and clean-machine validation
-(Tasks 5–7). Nothing else is claimed to work.
+Not implemented yet: CI and Copier update lifecycle testing (Task 6) and
+clean-machine validation (Task 7). Nothing else is claimed to work.
 
 Agent configuration is native to each harness, so no model or provider is a
 dependency of the devkit, and no check makes a paid model request.
@@ -55,7 +62,7 @@ for `sudo`.
 mise trust                       # after reviewing mise.toml
 mise install --locked            # runtimes and CLIs from mise.lock
 mise exec -- uv sync --locked    # Python tools from uv.lock
-mise run check                   # implemented checks (locked deps + strict docs)
+mise run check                   # locked deps, agent examples, specs, strict docs
 ```
 
 mise itself is installed manually; see
@@ -69,6 +76,7 @@ step-by-step version, including checksum verification.
 | Runtimes and CLI versions | mise | `mise.lock` (+ `.mise/locks/`) |
 | Python environment and dependencies | uv | `uv.lock` |
 | Project overlay and its lineage | Copier | `.copier-answers.yml` in each project |
+| Behavioral specifications and change tasks | OpenSpec | `openspec/` in each project |
 | Documentation structure | Diátaxis | `docs/` |
 | Documentation build | Zensical | `zensical.toml` |
 | Tasks | mise | `[tasks]` in `mise.toml` |
@@ -83,7 +91,7 @@ step-by-step version, including checksum verification.
 | Python quality | Ruff, mypy, pytest | pinned; run in generated projects |
 | Initial scaffold | native `uv init` | implemented (Task 4) |
 | Standards/docs overlay | Copier | implemented (Task 4) |
-| Specs and change checklists | OpenSpec | pinned, initialization planned |
+| Specs and change checklists | OpenSpec | implemented (Task 5) |
 | Routine coding | OpenCode + DeepSeek | configured, example only |
 | Advanced coding | Codex CLI + ChatGPT auth | configured, profile example |
 | Optional agent | Cline + DeepSeek | documented, interface-driven |
@@ -111,16 +119,21 @@ The documentation site uses Diátaxis and is built with Zensical
 [docs/index.md](docs/index.md).
 
 - [Getting started](docs/tutorials/getting-started.md) — install the toolchain and build the docs.
-- [Create your first Python project](docs/tutorials/first-python-project.md) — `uv init` plus the Copier overlay, verified end to end.
+- [Create your first Python project](docs/tutorials/first-python-project.md) — `uv init`, the Copier overlay and native OpenSpec initialization, verified end to end.
+- [Plan, implement and archive one change](docs/tutorials/spec-driven-change.md) — the complete OpenSpec lifecycle on a real `--name` argument.
 - [Install the development toolchain](docs/how-to/install-toolchain.md) — install, update, roll back.
+- [Initialize OpenSpec in a project](docs/how-to/initialize-openspec.md) — native init, another agent integration, generated-file updates.
+- [Validate changes and specifications](docs/how-to/validate-openspec.md) — the native command and the common validation failures.
 - [Update a project's overlay](docs/how-to/update-project-overlay.md) — the native Copier update procedure.
 - [Configure coding agents](docs/how-to/configure-coding-agents.md) — OpenCode with DeepSeek, Codex with ChatGPT, optional Cline.
 - [Troubleshoot agent setup](docs/how-to/troubleshoot-agent-setup.md) — missing credentials, rejected model identifiers.
 - [Tool ownership and pinned versions](docs/reference/tool-versions.md) — the tested version tuple.
 - [Generated project: commands and contents](docs/reference/generated-project.md) — what the overlay renders and what it runs.
+- [OpenSpec: commands, generated files and validation](docs/reference/openspec.md) — paths, owners, workflows and harness syntax.
 - [Agent configuration](docs/reference/agent-configuration.md) — locations, precedence, credentials, verified capabilities.
 - [Reproducibility and Python ownership](docs/explanation/reproducibility.md) — why mise and uv are separate.
-- [Who owns which file in a generated project](docs/explanation/generated-project-ownership.md) — uv versus Copier versus mise.
+- [Who owns which file in a generated project](docs/explanation/generated-project-ownership.md) — uv versus Copier versus mise versus OpenSpec.
+- [OpenSpec, AGENTS.md and ADRs](docs/explanation/openspec-and-agents.md) — requirements, tasks, standards and rationale.
 - [Why agent configuration stays native](docs/explanation/agent-independence.md) — no router, separate billing paths.
 - [ADR 0001](docs/explanation/decisions/0001-minimal-devkit.md) — design rationale.
 - [ADR 0002](docs/explanation/decisions/0002-script-project-overlay.md) — overlay scope and provenance.

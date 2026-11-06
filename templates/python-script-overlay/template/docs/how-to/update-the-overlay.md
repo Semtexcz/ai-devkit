@@ -71,6 +71,13 @@ review the result as if it were a fresh overlay.
 | `AGENTS.md`, `mise.toml`, `ruff.toml`, `mypy.ini`, `pytest.ini`, `zensical.toml`, `docs/`, `tests/`, `.gitignore` | Updated; your edits may conflict |
 | `main.py` | Never rendered by the overlay: it stays yours |
 | `pyproject.toml`, `uv.lock`, `.venv/` | Never rendered by the overlay: uv owns them |
+| `openspec/` | Not overlay content: OpenSpec owns the specifications and your changes |
+| `.opencode/`, `.agents/` | Not overlay content: `openspec update` regenerates them |
+
+An overlay update never changes a specification, a proposed change or an agent
+integration file. Update those with OpenSpec's own commands — `openspec archive`
+for a change, `openspec update` for the generated integrations — and never by
+copying files between projects.
 
 After resolving an update, run the full check and review the diff:
 

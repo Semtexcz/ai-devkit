@@ -1,12 +1,14 @@
 # Project toolchain.
 #
-# mise owns the Python interpreter, the uv CLI and the task definitions below.
+# mise owns the Python interpreter, the uv CLI, the Node.js runtime behind
+# OpenSpec, and the task definitions below.
 # uv owns the virtual environment and the Python dependencies recorded in
 # `pyproject.toml` and `uv.lock`. Neither is duplicated here: a tool version lives
 # in `[tools]`, a Python package version lives in `pyproject.toml`.
 #
 # Install with:  mise install
 # Sync Python:   uv sync --locked
+# Initialize specs: openspec init --tools opencode,codex --profile core
 
 min_version = "2026.11.1"
 
@@ -32,10 +34,14 @@ UV_PYTHON_DOWNLOADS = "never"
 [tools]
 python = "3.13.18"
 "aqua:astral-sh/uv" = "0.13.7"
+# OpenSpec is a Node.js CLI. Node.js is pinned because OpenSpec needs it to start,
+# and the npm backend is declared with the published package name.
+node = "24.22.2"
+"npm:@fission-ai/openspec" = "1.16.0"
 
 [tasks.check]
-description = "Run every check: locked dependencies, lint, format, types, tests and docs"
-depends = ["lock-check", "lint", "format-check", "typecheck", "test", "docs"]
+description = "Run every check: locked dependencies, lint, format, types, tests, docs and specs"
+depends = ["lock-check", "lint", "format-check", "typecheck", "test", "docs", "spec-check"]
 
 [tasks."lock-check"]
 description = "Verify that uv.lock matches pyproject.toml"
@@ -68,6 +74,10 @@ run = "uv run --locked zensical build --strict"
 [tasks."docs-serve"]
 description = "Preview the documentation site locally with live reload"
 run = "uv run --locked zensical serve"
+
+[tasks."spec-check"]
+description = "Validate every OpenSpec change and specification with the native CLI"
+run = "openspec validate --all --strict --no-interactive"
 
 [tasks.start]
 description = "Run the script entry point"

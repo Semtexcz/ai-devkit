@@ -152,13 +152,44 @@ green check.
 mise run lock-tools      # runs `mise lock`
 ```
 
-This writes `mise.lock` for the pinned Python and uv, including checksums and
-download URLs. Commit it once the project is a Git repository, then
-`mise install --locked` installs only those versions. The step needs network
-access for checksum provenance, and it is verified manually rather than by
-`mise run test-template`.
+This writes `mise.lock` for the pinned Python, uv, Node.js and OpenSpec, including
+checksums and download URLs for the archive-based tools and the npm dependency
+sidecar under `.mise/locks/` for OpenSpec. Commit it once the project is a Git
+repository, then `mise install --locked` installs only those versions.
 
-## Step 6: run and verify the project
+`mise run test-template` performs this step too: it runs `mise lock` in the generated
+project, installs the result with `mise install --locked` into a throwaway mise
+installation, and verifies the recorded versions, checksums and sidecar.
+
+## Step 6: initialize OpenSpec
+
+```bash
+mise exec -- openspec init --tools opencode,codex --profile core
+```
+
+OpenSpec is a Node.js CLI, so `mise.toml` pins Node.js 24.22.2 and OpenSpec 1.16.0
+next to Python and uv; the project does not depend on a globally installed copy.
+
+The command creates the project's own `openspec/` directory and the OpenCode and
+Codex integrations:
+
+```text
+openspec/config.yaml            schema: spec-driven
+openspec/specs/                 behavioral specifications
+openspec/changes/               proposed changes
+.opencode/commands/opsx-*.md    six OpenCode slash commands
+.opencode/skills/               six OpenCode skills
+.agents/skills/                 six Codex skills (Codex receives no slash commands)
+```
+
+Nothing is copied from the ai-devkit checkout: this project owns its specifications,
+and the Copier overlay never renders OpenSpec's generated files. Run the command
+before `mise run check`, because `openspec validate` fails outside an initialized
+project. See [Initialize OpenSpec in a project](../how-to/initialize-openspec.md) for
+another agent, and the [OpenSpec reference](../reference/openspec.md) for the exact
+invocation each harness supports.
+
+## Step 7: run and verify the project
 
 ```bash
 mise exec -- uv run --locked python main.py
@@ -166,9 +197,9 @@ mise exec -- uv run --locked pytest
 mise run check
 ```
 
-Expected output of the first command is the greeting from `main.py`. The second
-runs the smoke test, which executes `main.py` as a subprocess and asserts that it
-succeeds and prints something — it does not assert the greeting text.
+Expected output of the first command is the greeting from `main.py`. The second runs
+the smoke test, which executes `main.py` as a subprocess and asserts that it succeeds
+and prints something — it does not assert the greeting text.
 
 `mise run check` runs the verification contract:
 
@@ -179,12 +210,15 @@ uv run --locked ruff format --check .
 uv run --locked mypy --strict main.py
 uv run --locked pytest
 uv run --locked zensical build --strict
+openspec validate --all --strict --no-interactive
 ```
 
-All six must pass. There is deliberately no OpenSpec validation yet: OpenSpec is
-initialized in a later task.
+All seven must pass. The last one is OpenSpec's own validation of `openspec/specs/`
+and `openspec/changes/`; a freshly initialized project reports an empty scope, and
+the first specification you write is what turns that check into evidence. An invalid
+specification makes the whole command exit non-zero.
 
-## Step 7: put the project under version control
+## Step 8: put the project under version control
 
 ```bash
 git init
@@ -192,10 +226,10 @@ git add --all
 git commit -m "Create the project from uv init and the ai-devkit overlay"
 ```
 
-Commit `uv.lock`, `mise.lock`, `.copier-answers.yml`, `AGENTS.md` and `docs/`. The
-generated `.gitignore` already excludes `.venv/`, caches, `site/` and `.env`. A Git
-repository with a clean tree is also the prerequisite for later
-[Copier updates](../how-to/update-project-overlay.md).
+Commit `uv.lock`, `mise.lock`, `.mise/locks/`, `.copier-answers.yml`, `AGENTS.md`,
+`docs/`, `openspec/`, `.opencode/` and `.agents/`. The generated `.gitignore` already
+excludes `.venv/`, caches, `site/` and `.env`. A Git repository with a clean tree is
+also the prerequisite for later [Copier updates](../how-to/update-project-overlay.md).
 
 ## What you have now
 
@@ -204,19 +238,25 @@ repository with a clean tree is also the prerequisite for later
 | `uv init` and uv | `main.py`, `pyproject.toml`, `uv.lock`, `.venv/` |
 | mise | `mise.toml`, `mise.lock`, the tasks |
 | Copier overlay | `AGENTS.md`, checker configuration, `docs/`, `tests/`, `.gitignore`, `.copier-answers.yml` |
+| OpenSpec | `openspec/`, `.opencode/`, `.agents/` |
 
 Read [Who owns which file](../explanation/generated-project-ownership.md) for the
 reasoning, and the
 [generated project reference](../reference/generated-project.md) for every task and
-version.
+version. The next step is a real change:
+[Plan, implement and archive one change](spec-driven-change.md).
 
 ## Known limitations
 
 - Linux x86-64 is the only verified platform; `mise.lock` covers `linux-x64`.
-- No ai-devkit release tag exists yet, so only the `--vcs-ref HEAD` form has been
-  run in this repository. Tag-based provenance is verified with a temporary
-  tagged repository.
-- The project is an unpackaged application; there is no build backend and nothing
-  is published.
-- `mise run test-template` does not create `mise.lock`; it needs network access.
-- Specifications and change checklists are not part of this workflow yet.
+- No ai-devkit release tag exists yet, so only the `--vcs-ref HEAD` form of the Copier
+  command has been run in this repository. Tag-based provenance is verified with a
+  temporary tagged repository.
+- The project is an unpackaged application; there is no build backend and nothing is
+  published.
+- OpenSpec validation passes vacuously while `openspec/specs/` is empty. That is
+  native behavior (`No items found to validate.`), not a devkit guarantee; the first
+  specification is what the check actually verifies.
+- The generated `.opencode/` and `.agents/` integrations are executed by their
+  harnesses. This workflow verifies that they are generated by the pinned OpenSpec
+  CLI, not that a harness runs them.

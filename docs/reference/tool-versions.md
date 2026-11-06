@@ -93,22 +93,31 @@ mise exec -- uv run python -c 'import sys; print(sys.executable)'
 The comparison must print `OK`; `mise which` reflects the active mise data
 directory, so no fixed install path is assumed.
 
+`mise run test-template` verifies the same identity in a generated project, without
+relying on version strings: after `mise install --locked` it recreates `.venv` with
+`mise exec -- uv venv --clear`, synchronizes it with `uv sync --locked`, and asserts
+that `sys.base_prefix` of `.venv/bin/python` equals `sys.base_prefix` of the
+interpreter that the isolated mise selects, that both live under the fixture's own
+mise data directory, and that `readlink -f .venv/bin/python` resolves to the selected
+interpreter.
+
 ## Tasks
 
 | Command | Runs |
 |---|---|
 | `mise run docs` | `uv run --locked zensical build --strict` |
 | `mise run docs-serve` | `uv run --locked zensical serve` |
-| `mise run check` | `mise run lock-check`, `mise run examples-check`, then `mise run docs` |
+| `mise run check` | `mise run lock-check`, `mise run examples-check`, `mise run spec-check`, then `mise run docs` |
+| `mise run spec-check` | `openspec validate --all --strict --no-interactive` |
 | `mise run test-template` | `uv run --locked pytest tests/` — the project generation integration test |
 | `mise run lock-check` | `uv lock --check` |
 | `mise run examples-check` | parses the JSON and TOML agent configuration examples |
 | `mise run versions` | prints every pinned version |
 
-`check` deliberately contains only the checks that exist for this repository.
-OpenSpec validation arrives with the OpenSpec task. `test-template` is kept
-separate because it installs a project's own dependencies from the package index;
-CI is expected to run both.
+`check` contains only the checks that exist for this repository. `spec-check` is
+OpenSpec's own validation of `openspec/specs/` and `openspec/changes/`; `test-template`
+is kept separate because it installs a project's own dependencies from the package
+index, so CI is expected to run both.
 
 ## Project overlay
 

@@ -65,16 +65,22 @@ mise run start
 mise run check
 ```
 
-Every check must pass before the change is complete. The smoke test in
-`tests/test_main.py` runs `main.py` as a subprocess and asserts only that it
+Every check must pass before the change is complete: locked dependencies, lint,
+formatting, types, tests, the documentation build and OpenSpec validation. The smoke
+test in `tests/test_main.py` runs `main.py` as a subprocess and asserts only that it
 succeeds and prints something, so it keeps passing when the message changes.
 
 If a check fails, fix the cause. Do not relax the checker configuration in
 `ruff.toml`, `mypy.ini` or `pytest.ini` to obtain a passing result.
 
+The last check, `openspec validate --all --strict --no-interactive`, needs the
+one-time `openspec init --tools opencode,codex --profile core` from the README; it
+fails instead of skipping when the project has no `openspec/` root.
+
 ## What you have now
 
-A project where one command, `mise run check`, verifies dependency locking,
-style, types, behavior and documentation. To add a library, read
-[Add a dependency](../how-to/add-a-dependency.md). To understand which tool owns
-which file, read [File ownership](../explanation/ownership.md).
+A project where one command, `mise run check`, verifies dependency locking, style,
+types, behavior, documentation and specifications. To add a library, read
+[Add a dependency](../how-to/add-a-dependency.md). To plan a change before
+implementing it, read [Work with OpenSpec](../how-to/use-openspec.md). To understand
+which tool owns which file, read [File ownership](../explanation/ownership.md).

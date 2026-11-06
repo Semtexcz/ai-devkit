@@ -20,13 +20,18 @@ Portable: no host-specific paths, no required agent, model or provider. See
 
 - Follow the [approved implementation plan](docs/plans/ai-devkit-v0.1.md).
 - Keep changes limited to the current task.
-- OpenSpec will own specifications and change checklists once integrated; until
-  then, the plan defines scope.
+- OpenSpec owns behavioral requirements and change task lists. Specs live in
+  `openspec/specs/`, proposed changes in `openspec/changes/`; both are written and
+  validated by the native CLI (`openspec new change`, `openspec validate`,
+  `openspec archive`). Do not create a backlog, task-state file or workflow schema
+  next to them.
+- `AGENTS.md` owns engineering rules, ADRs own architectural rationale, and
+  OpenSpec owns what the system must do; see
+  [OpenSpec, AGENTS.md and ADRs](docs/explanation/openspec-and-agents.md).
 - Prefer deterministic testing and validation.
 - Keep documentation synchronized with implementation.
 - Never report unexecuted checks as passed.
-- Run `mise run check` before reporting a task complete; it currently runs the
-  checks that exist at this stage.
+- Run `mise run check` before reporting a task complete.
 
 ## Toolchain and checks
 
@@ -39,11 +44,25 @@ Portable: no host-specific paths, no required agent, model or provider. See
   versions and `UV_NO_MANAGED_PYTHON=1` apply.
 - Do not add a `.python-version` file; mise selects the interpreter.
 - Tasks: `docs` (strict build), `docs-serve`, `lock-check`, `examples-check`,
-  `test-template`, `check`, `versions`. Add checks to `check` only when the
-  capability genuinely exists.
+  `spec-check`, `test-template`, `check`, `versions`. Add checks to `check` only when
+  the capability genuinely exists.
+- `mise run check` runs `lock-check`, `examples-check`, `spec-check` and `docs`.
+  `spec-check` is the native command `openspec validate --all --strict
+  --no-interactive`; never replace it with a custom parser.
 - `mise run test-template` is the generation integration test. It needs the package
   index and is therefore kept out of `check`; run both before reporting a change
   that touches the overlay.
+
+## OpenSpec integration boundary
+
+- OpenSpec is initialized natively: `openspec init --tools opencode,codex --profile
+  core`. Its generated files (`openspec/`, `.opencode/`, `.agents/`) have exactly one
+  owner: OpenSpec. Never hand-edit them, never copy them from another project, and
+  never render them through Copier.
+- `openspec/config.yaml` carries the schema and, if needed, project rules. Model
+  names, providers and credentials never appear in it.
+- A generated project initializes OpenSpec itself, with the command above, and pins
+  OpenSpec and Node.js in its own `mise.toml`.
 
 ## Project overlay boundary
 
@@ -52,6 +71,9 @@ Portable: no host-specific paths, no required agent, model or provider. See
 - The overlay owns policy: rules, checker configuration, documentation seeds and
   ignore rules. It must never render `main.py`, `pyproject.toml`, `uv.lock` or
   `.python-version`, because uv and the project developer own those files.
+- It must also never render `openspec/`, `.opencode/`, `.agents/` or `.clinerules/`:
+  OpenSpec generates those in each project, and a template copy would be a second
+  owner that drifts from the pinned CLI.
 - Copier provenance is `.copier-answers.yml`, rendered by the template. Never add a
   devkit-specific version table or a custom update command.
 - Do not add Copier tasks that execute commands, and do not patch application code

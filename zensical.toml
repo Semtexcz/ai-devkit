@@ -14,9 +14,12 @@ nav = [
   { "Tutorials" = [
     { "Getting started" = "tutorials/getting-started.md" },
     { "Create your first Python project" = "tutorials/first-python-project.md" },
+    { "Plan, implement and archive one change" = "tutorials/spec-driven-change.md" },
   ] },
   { "How-to guides" = [
     { "Install the development toolchain" = "how-to/install-toolchain.md" },
+    { "Initialize OpenSpec in a project" = "how-to/initialize-openspec.md" },
+    { "Validate changes and specifications" = "how-to/validate-openspec.md" },
     { "Configure coding agents" = "how-to/configure-coding-agents.md" },
     { "Troubleshoot agent setup" = "how-to/troubleshoot-agent-setup.md" },
     { "Update a project's overlay" = "how-to/update-project-overlay.md" },
@@ -24,11 +27,13 @@ nav = [
   { "Reference" = [
     { "Tool ownership and pinned versions" = "reference/tool-versions.md" },
     { "Generated project: commands and contents" = "reference/generated-project.md" },
+    { "OpenSpec: commands and generated files" = "reference/openspec.md" },
     { "Agent configuration" = "reference/agent-configuration.md" },
   ] },
   { "Explanation" = [
     { "Reproducibility and Python ownership" = "explanation/reproducibility.md" },
     { "Who owns which file in a generated project" = "explanation/generated-project-ownership.md" },
+    { "OpenSpec, AGENTS.md and ADRs" = "explanation/openspec-and-agents.md" },
     { "Why agent configuration stays native" = "explanation/agent-independence.md" },
     { "ADR 0001: minimal configuration-first devkit" = "explanation/decisions/0001-minimal-devkit.md" },
     { "ADR 0002: script project overlay" = "explanation/decisions/0002-script-project-overlay.md" },

@@ -12,7 +12,13 @@ rendered, and why one line of `main.py` is yours to write.
 | Environment, dependencies, lockfile | uv | `pyproject.toml`, `uv.lock`, `.venv/` |
 | Interpreter, tool versions, tasks | mise | `mise.toml`, `mise.lock` |
 | Standards, checker policy, documentation seeds | Copier overlay | `AGENTS.md`, `ruff.toml`, `mypy.ini`, `pytest.ini`, `zensical.toml`, `README.md`, `docs/`, `tests/`, `.gitignore`, `.copier-answers.yml` |
+| Behavioral specifications, change checklists, agent integrations | OpenSpec | `openspec/`, `.opencode/`, `.agents/` |
 | Template lineage | Copier | `.copier-answers.yml` |
+
+OpenSpec is the second tool that owns generated files. It is initialized by its own
+CLI inside the project, which is why the overlay renders neither the specifications
+nor the integration files: the pinned OpenSpec version, not the template, decides what
+those look like, and `openspec update` is the command that refreshes them.
 
 ## Policy versus resolution
 
@@ -70,12 +76,13 @@ uv run --locked ruff format --check .    uv runs Ruff
 uv run --locked mypy --strict main.py    uv runs mypy
 uv run --locked pytest                   uv runs pytest
 uv run --locked zensical build --strict  uv runs Zensical
+openspec validate --all --strict --no-interactive   mise installs OpenSpec, which validates its own artifacts
 ```
 
-mise supplies the interpreter and the tools, uv resolves and runs them, and the
-checker configuration comes from the overlay. The type-checking target is `main.py`
-only; widen it in `mypy.ini` and in the `typecheck` task when modules are added, so
-both stay in step.
+mise supplies the interpreter and the tools, uv resolves and runs the Python ones, the
+checker configuration comes from the overlay, and OpenSpec validates the
+specifications it owns. The type-checking target is `main.py` only; widen it in
+`mypy.ini` and in the `typecheck` task when modules are added, so both stay in step.
 
 ## Reproducibility and its limits
 

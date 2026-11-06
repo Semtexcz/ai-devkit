@@ -72,12 +72,20 @@ print("Agent configuration examples parse (syntax only).")
 PY
 """
 
+[tasks."spec-check"]
+description = "Validate every OpenSpec change and specification with the native CLI"
+# Native OpenSpec validation; no custom parser and no separate schema. Specs live
+# in openspec/specs/ and proposed changes in openspec/changes/; both are validated
+# with --strict, which rejects a requirement without a scenario and a spec without
+# a purpose. --no-interactive keeps it usable in a task runner.
+run = "openspec validate --all --strict --no-interactive"
+
 [tasks.check]
-description = "Run every check implemented so far (locked dependencies, agent examples, strict docs build)"
-depends = ["lock-check", "examples-check", "docs"]
+description = "Run every check implemented so far (locked dependencies, agent examples, specs, strict docs build)"
+depends = ["lock-check", "examples-check", "spec-check", "docs"]
 
 [tasks."test-template"]
-description = "Create a Python script project with native uv and Copier, then verify it end to end"
+description = "Create a Python script project with native uv, Copier and OpenSpec, then verify it end to end"
 # Deliberately separate from `check`: this test installs the project's own
 # dependencies and needs the package index, so it is the slower integration gate.
 # CI runs both; see docs/reference/generated-project.md.

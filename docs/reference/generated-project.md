@@ -32,6 +32,7 @@ out `--vcs-ref`, and stores `_commit`.
 | `docs/index.md` | documentation entry point |
 | `docs/tutorials/run-the-script.md` | tutorial |
 | `docs/how-to/add-a-dependency.md` | how-to |
+| `docs/how-to/use-openspec.md` | how-to: initialize OpenSpec, propose, validate, archive |
 | `docs/how-to/update-the-overlay.md` | how-to |
 | `docs/reference/commands.md` | reference |
 | `docs/explanation/ownership.md` | explanation |
@@ -43,11 +44,16 @@ Never rendered: `main.py`, `pyproject.toml`, `uv.lock`, `.python-version`. uv an
 the project developer own those; see
 [Who owns which file](../explanation/generated-project-ownership.md).
 
+Also never rendered: `openspec/`, `.opencode/` and `.agents/`. Those are created by
+`openspec init` inside the project, and refreshed by `openspec update`. A copy in the
+overlay would be a second owner that drifts from the pinned CLI, so the integration
+test asserts that no template path is one of them.
+
 ## Tasks in the generated project
 
 | Task | Underlying command |
 |---|---|
-| `mise run check` | lock check, lint, format check, type check, tests, docs |
+| `mise run check` | lock check, lint, format check, type check, tests, docs, specs |
 | `mise run lock-check` | `uv lock --check` |
 | `mise run lint` | `uv run --locked ruff check .` |
 | `mise run format-check` | `uv run --locked ruff format --check .` |
@@ -56,11 +62,14 @@ the project developer own those; see
 | `mise run test` | `uv run --locked pytest` |
 | `mise run docs` | `uv run --locked zensical build --strict` |
 | `mise run docs-serve` | `uv run --locked zensical serve` |
+| `mise run spec-check` | `openspec validate --all --strict --no-interactive` |
 | `mise run start` | `uv run --locked python main.py` |
 | `mise run lock-tools` | `mise lock` |
 
-`mise run check` runs its six checks one at a time (`[settings] jobs = 1`), so a
-fresh checkout cannot race on creating `.venv`.
+`mise run check` runs its seven checks one at a time (`[settings] jobs = 1`), so a
+fresh checkout cannot race on creating `.venv`. The OpenSpec check requires the
+project's one-time `openspec init`; without an `openspec/` root it fails instead of
+skipping.
 
 ## Versions the overlay pins
 
@@ -68,6 +77,8 @@ fresh checkout cannot race on creating `.venv`.
 |---|---|---|---|
 | Python | 3.13.18 | mise | generated `mise.toml` |
 | uv | 0.13.7 | mise | generated `mise.toml` |
+| Node.js | 24.22.2 | mise | generated `mise.toml` |
+| OpenSpec | 1.16.0 | mise | generated `mise.toml` |
 | Ruff | 0.17.3 | uv | generated `pyproject.toml`, `uv.lock` |
 | mypy | 2.4.1 | uv | generated `pyproject.toml`, `uv.lock` |
 | pytest | 9.2.0 | uv | generated `pyproject.toml`, `uv.lock` |
@@ -77,6 +88,11 @@ fresh checkout cannot race on creating `.venv`.
 The four Python tools are installed in the generated project with `uv add --dev`,
 using those exact versions. The overlay renders no dependency list, so the versions
 exist once, in the project's own uv-owned manifest.
+
+Node.js is pinned because OpenSpec is a Node.js CLI. `mise lock` records Python, uv
+and Node.js with a per-platform checksum and URL, and OpenSpec through an npm
+dependency sidecar under `.mise/locks/`, so the generated project can run OpenSpec
+without a global installation or a copy from this repository.
 
 ## Provenance
 
@@ -109,32 +125,42 @@ breaks the update path. The update procedure is
 mise run test-template
 ```
 
-The test creates a project with the real `mise`, `uv`, `git` and Copier
+The test creates a project with the real `mise`, `uv`, `git`, Copier and OpenSpec
 executables — no mocks — in a temporary directory whose name contains a space. It
 asserts:
 
 1. the project is created, runs, passes its smoke test and passes its own
    `mise run check`;
 2. `main.py` and `pyproject.toml` are byte-identical to the uv output after the
-   overlay is applied, and no template file could render them;
+   overlay is applied, and no template file could render them or copy an agent
+   integration;
 3. the exact dependency versions are recorded in `pyproject.toml` and `uv.lock`;
 4. native `mise lock` writes the project's own `mise.lock`; it records exactly the
-   Python and uv versions pinned by the rendered `mise.toml`, with a checksum and
-   a download URL for `linux-x64`, and it is not a copy of this repository's
-   `mise.lock`;
-5. `mise install --locked` installs that lockfile into a throwaway mise
-   installation whose data, cache and state directories live inside the fixture,
-   and `mise run check` passes with those freshly installed tools;
-6. provenance is recorded, including a tag from a temporary tagged repository;
-7. the project is independent: its own `.venv`, its own `uv.lock` and
-   `mise.lock`, no `.python-version`, no workspace membership, no agent
-   configuration;
-8. a deliberately broken test and a lint violation each make `mise run check` fail,
-   and the fixture is restored afterwards;
-9. Copier answers containing double quotes, backslashes, Unicode and newlines
-   render a `zensical.toml` that `tomllib` parses back to the original answers, so
-   no punctuation has to be forbidden in a project name or description;
-10. the devkit working tree is unchanged by the run.
+   Python, uv, Node.js and OpenSpec versions pinned by the rendered `mise.toml` — with
+   a checksum and a download URL for the archive tools and an npm sidecar with a
+   digest for OpenSpec — and it is not a copy of this repository's `mise.lock`;
+5. `mise install --locked` installs that lockfile into a throwaway mise installation
+   whose data, cache, state and `XDG_CONFIG_HOME` live inside the fixture, and
+   `mise run check` passes with those freshly installed tools;
+6. `.venv` is recreated with that isolated toolchain, and the interpreter identity is
+   verified through `sys.base_prefix` and `readlink -f` rather than a version string;
+7. `openspec init --tools opencode,codex --profile core`, run by the project's own
+   pinned CLI, produces `openspec/`, `.opencode/commands/` and `.agents/skills/`, and
+   the project's `mise run check` validates specifications with the native command;
+8. provenance is recorded, including a tag from a temporary tagged repository;
+9. the project is independent: its own `.venv`, its own `uv.lock` and `mise.lock`, no
+   `.python-version`, no workspace membership, no agent credentials or model settings;
+10. a deliberately broken test and a lint violation each make `mise run check` fail,
+    and the fixture is restored afterwards;
+11. a deliberately invalid specification makes `mise run check` fail and the restored
+    valid state passes again;
+12. the worked example in `examples/openspec-change/` runs the full lifecycle in the
+    project — propose, validate, implement, test, document, validate, `mise run check`,
+    mark tasks complete, archive — and the archived project still passes its check;
+13. Copier answers containing double quotes, backslashes, Unicode and newlines render
+    a `zensical.toml` that `tomllib` parses back to the original answers, so no
+    punctuation has to be forbidden in a project name or description;
+14. the devkit working tree is unchanged by the run.
 
 The overlay never copies this repository's `mise.lock` into a project. A lock
 describes the platform it was created on, so the generated project runs

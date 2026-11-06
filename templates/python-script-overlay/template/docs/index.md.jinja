@@ -10,9 +10,11 @@ line.
 
 - `main.py` runs (`mise run start`).
 - `mise run check` passes: locked dependency check, Ruff lint, Ruff format check,
-  `mypy --strict`, pytest and this documentation build.
+  `mypy --strict`, pytest, this documentation build and OpenSpec validation.
 - The project has its own `uv.lock` and `mise.lock`, so both dependency layers are
   reproducible.
+- `openspec/` holds the specifications and the proposed changes, initialized once
+  with `openspec init --tools opencode,codex --profile core`.
 
 ## Start here
 
@@ -22,6 +24,8 @@ line.
 | How-to guide | Achieve a specific goal | [Add a dependency](how-to/add-a-dependency.md) |
 | Reference | Look up exact commands and versions | [Commands and versions](reference/commands.md) |
 | Explanation | Understand how the files relate | [File ownership](explanation/ownership.md) |
+
+Planning a change before implementing it: [Work with OpenSpec](how-to/use-openspec.md).
 
 The engineering rules that apply to changes in this project are in `AGENTS.md` at
 the repository root.

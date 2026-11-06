@@ -12,7 +12,8 @@ code, and why `pyproject.toml` is never edited by the template.
 | uv (ongoing) | environment, dependencies, lockfile | `pyproject.toml`, `uv.lock`, `.venv/` |
 | mise | interpreter, tool versions, tasks | `mise.toml`, `mise.lock` |
 | Copier overlay | standards and documentation seeds | `AGENTS.md`, `ruff.toml`, `mypy.ini`, `pytest.ini`, `zensical.toml`, `docs/`, `tests/`, `.gitignore`, `.copier-answers.yml` |
-| You | application behavior | `main.py` and everything you add |
+| OpenSpec `init` (ongoing) | specifications, change checklists, agent integrations | `openspec/`, `.opencode/`, `.agents/` |
+| You | application behavior and the specifications you write | `main.py`, `openspec/specs/`, `openspec/changes/` |
 
 ## Why the overlay does not own `pyproject.toml`
 
@@ -69,7 +70,13 @@ uv run --locked ruff format --check .
 uv run --locked mypy --strict main.py
 uv run --locked pytest
 uv run --locked zensical build --strict
+openspec validate --all --strict --no-interactive
 ```
+
+The first six belong to tools uv runs and the overlay configures. The last one is
+OpenSpec's own validation: it reads `openspec/specs/` and `openspec/changes/` and
+fails on a malformed requirement, so a specification cannot drift into prose that no
+tool can check.
 
 The type-checking target is `main.py` only. Widen it in `mypy.ini` and in the
 `typecheck` task when you add modules, so both stay in step.

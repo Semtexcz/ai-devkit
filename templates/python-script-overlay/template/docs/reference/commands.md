@@ -93,13 +93,26 @@ that generated it. Create and commit it once, on the platform you support:
 
 ```bash
 mise lock                     # same as `mise run lock-tools`
-git add mise.lock
+git add mise.lock .mise/locks/
 git commit -m "chore: lock tool versions"
 ```
 
+Commit both, because a reproducible install needs both:
+
+| Path | Contents |
+|---|---|
+| `mise.lock` | the resolved version, checksum and download URL of every tool in `[tools]` |
+| `.mise/locks/` | the npm sidecar lock for a tool mise installs from npm — here `npm:@fission-ai-openspec` — which records that CLI's transitive dependency graph |
+
+OpenSpec is a Node.js CLI, so mise resolves its dependencies through npm and
+keeps that graph next to `mise.lock`. Staging only `mise.lock` leaves the sidecar
+untracked, and a fresh checkout then re-resolves the npm graph instead of
+installing the reviewed one.
+
 After that, `mise install --locked` installs only the recorded versions and
 verifies their checksums. Update the lock the same way after changing `[tools]`
-in `mise.toml`.
+in `mise.toml`; the diff should show the changed tool plus the sidecar entry for
+an npm tool.
 
 ## Environment behavior
 

@@ -18,7 +18,8 @@ OpenSpec executables and follows the documented recipes in
 9. the entry point, the smoke test and `mise run check` are executed;
 10. the worked example in `examples/openspec-change/` runs the whole OpenSpec
     lifecycle — propose, validate, implement, test, archive — in the project;
-11. file ownership, isolation and failure detection are asserted.
+11. file ownership, isolation and failure detection are asserted: each of the six
+    named defects fails `mise run check` through the task that owns its checker.
 
 Copier answers are rendered once more with quotes, backslashes, Unicode and
 newlines, and the rendered `zensical.toml` is parsed back with `tomllib` to prove
@@ -35,34 +36,18 @@ from __future__ import annotations
 import os
 import re
 import shutil
-import subprocess
 import tomllib
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-
-# The documented uv initialization flags (see the tutorial and the v0.1 plan).
-UV_INIT_FLAGS = (
-    "--app",
-    "--no-package",
-    "--no-workspace",
-    "--no-pin-python",
-    "--no-readme",
-    "--vcs",
-    "none",
-)
-
-# The exact baseline development dependencies of this release.
-DEV_DEPENDENCIES = (
-    "mypy==2.4.1",
-    "pytest==9.2.0",
-    "ruff==0.17.3",
-    "zensical==0.0.74",
-)
+# The subprocess helpers and the release facts both integration modules share.
+from testkit import DEV_DEPENDENCIES, GIT_IDENTITY, REPO_ROOT, UV_INIT_FLAGS, git_status
+from testkit import executable as _which
+from testkit import run as _run
+from testkit import run_ok as _run_ok
 
 # The tool versions the overlay pins in the generated `mise.toml`. The generated
 # `mise.lock` must record exactly these, with checksums and download URLs, or with
@@ -184,13 +169,6 @@ TOML_EDGE_CASES = (
 # created, moved or pushed by this test.
 TEST_TAG = "v0.0.0"
 
-GIT_IDENTITY = (
-    "-c",
-    "user.name=ai-devkit integration test",
-    "-c",
-    "user.email=integration-test@example.invalid",
-)
-
 # The one project-owned edit the native scaffold requires: the pinned uv defines
 # `def main():` without a return annotation, which `mypy --strict` rejects.
 SCAFFOLD_ENTRY_POINT = "def main():\n"
@@ -208,56 +186,6 @@ class GeneratedProject:
     overlay_pyproject: str
     git_status_before: str
     mise_env: Mapping[str, str]
-
-
-def _which(name: str) -> str:
-    path = shutil.which(name)
-    if path is None:
-        pytest.fail(
-            f"`{name}` is required by this integration test; install the pinned "
-            "toolchain with `mise install --locked`."
-        )
-    return path
-
-
-def _run(
-    args: Sequence[str],
-    cwd: Path,
-    *,
-    env: Mapping[str, str] | None = None,
-    timeout: int = 1800,
-) -> subprocess.CompletedProcess[str]:
-    """Run one command without a shell and capture its output.
-
-    Standard input is closed, so a tool that decides to prompt fails instead of
-    waiting forever in a test run.
-    """
-    return subprocess.run(
-        list(args),
-        check=False,
-        cwd=str(cwd),
-        capture_output=True,
-        text=True,
-        timeout=timeout,
-        stdin=subprocess.DEVNULL,
-        env={**os.environ, **(env or {})},
-    )
-
-
-def _run_ok(
-    args: Sequence[str], cwd: Path, *, env: Mapping[str, str] | None = None
-) -> subprocess.CompletedProcess[str]:
-    result = _run(args, cwd, env=env)
-    assert result.returncode == 0, (
-        f"command failed with exit code {result.returncode}: {' '.join(args)}\n"
-        f"--- stdout ---\n{result.stdout}\n--- stderr ---\n{result.stderr}"
-    )
-    return result
-
-
-def _git_status() -> str:
-    """Return `git status --porcelain` for this repository."""
-    return _run_ok((_which("git"), "status", "--porcelain"), cwd=REPO_ROOT).stdout
 
 
 @pytest.fixture(scope="module")
@@ -314,7 +242,7 @@ def generated_project(
 
     base = tmp_path_factory.mktemp("first-python-project")
 
-    git_status_before = _git_status()
+    git_status_before = git_status()
 
     # 1. Native uv initialization. The destination contains a space and lives
     #    outside this repository.
@@ -741,44 +669,124 @@ def test_project_is_independent_of_the_devkit(
 
 def test_devkit_repository_is_untouched(generated_project: GeneratedProject) -> None:
     """Scenario C: verification creates nothing in the devkit working tree."""
-    assert _git_status() == generated_project.git_status_before
+    assert git_status() == generated_project.git_status_before
 
 
-def test_check_rejects_broken_verification(generated_project: GeneratedProject) -> None:
-    """Scenario D: a broken test or quality check makes `mise run check` fail."""
+@dataclass(frozen=True)
+class Defect:
+    """One deliberate violation and the checker that must report it.
+
+    `task` is the generated project's own task for that checker, so the failure
+    is attributed to the intended tool and not merely to whichever task
+    `mise run check` happens to run first.
+    """
+
+    name: str
+    task: str
+    path: str
+    change: str
+    evidence: tuple[str, ...]
+
+
+# Each defect targets exactly one checker: it is lint-clean, format-clean,
+# type-clean, or test-clean apart from the one property it breaks. A formatting
+# defect that also broke linting would prove nothing about the format check.
+DEFECTS = (
+    pytest.param(
+        Defect(
+            name="lint",
+            task="lint",
+            path="main.py",
+            change="import os\n",
+            evidence=("F401", "unused"),
+        ),
+        id="ruff-lint",
+    ),
+    pytest.param(
+        Defect(
+            name="format",
+            task="format-check",
+            path="main.py",
+            change='\nGREETINGS: list[str] = [\n    "hello"\n]\n',
+            evidence=("would be reformatted",),
+        ),
+        id="ruff-format",
+    ),
+    pytest.param(
+        Defect(
+            name="type",
+            task="typecheck",
+            path="main.py",
+            change='\n\ndef counting() -> int:\n    return "not an integer"\n',
+            evidence=("Incompatible return value type", "[return-value]"),
+        ),
+        id="mypy-strict",
+    ),
+    pytest.param(
+        Defect(
+            name="test",
+            task="test",
+            path="tests/test_main.py",
+            change=(
+                "\n\ndef test_deliberate_failure() -> None:\n"
+                '    assert "expected" == "actual"\n'
+            ),
+            evidence=("test_deliberate_failure", "failed"),
+        ),
+        id="pytest",
+    ),
+    pytest.param(
+        Defect(
+            name="documentation link",
+            task="docs",
+            path="docs/index.md",
+            change="\nSee [the missing page](reference/missing-page.md).\n",
+            evidence=("page does not exist", "Aborted because --strict"),
+        ),
+        id="broken-doc-link",
+    ),
+)
+
+
+@pytest.mark.parametrize("defect", DEFECTS)
+def test_check_rejects_declared_defect(
+    generated_project: GeneratedProject, defect: Defect
+) -> None:
+    """Task 6: every check the contract names fails on its own defect.
+
+    Each case introduces one defect, proves that the task owning the check
+    reports it, proves that `mise run check` exits nonzero, restores the fixture
+    and proves that the restored project passes again. The OpenSpec case is
+    `test_check_rejects_invalid_specification` below.
+    """
     mise = _which("mise")
     destination = generated_project.destination
-    test_path = destination / "tests" / "test_main.py"
-    main_path = destination / "main.py"
-    original_test = test_path.read_text(encoding="utf-8")
-    original_main = main_path.read_text(encoding="utf-8")
+    path = destination / defect.path
+    original = path.read_text(encoding="utf-8")
 
     try:
-        # A failing test must be detected by the pytest check.
-        test_path.write_text(
-            original_test
-            + "\n\ndef test_deliberate_failure() -> None:\n"
-            + '    assert "expected" == "actual"\n',
-            encoding="utf-8",
+        path.write_text(original + defect.change, encoding="utf-8")
+
+        owned = _run((mise, "run", defect.task), cwd=destination)
+        owned_output = owned.stdout + owned.stderr
+        assert owned.returncode != 0, (
+            f"`mise run {defect.task}` accepted the {defect.name} defect\n{owned_output}"
         )
-        broken_test = _run((mise, "run", "check"), cwd=destination)
-        assert broken_test.returncode != 0, "a failing test must fail mise run check"
-        output = broken_test.stdout + broken_test.stderr
-        assert "test_deliberate_failure" in output, output
+        assert any(marker in owned_output for marker in defect.evidence), (
+            f"`mise run {defect.task}` failed without reporting the {defect.name} "
+            f"defect; expected one of {defect.evidence}\n{owned_output}"
+        )
 
-        # A lint violation must be detected by the Ruff check.
-        test_path.write_text(original_test, encoding="utf-8")
-        main_path.write_text(original_main + "\nimport os\n", encoding="utf-8")
-        broken_lint = _run((mise, "run", "check"), cwd=destination)
-        assert broken_lint.returncode != 0, "a lint violation must fail mise run check"
-        lint_output = broken_lint.stdout + broken_lint.stderr
-        assert "ruff" in lint_output.lower(), lint_output
+        failed = _run((mise, "run", "check"), cwd=destination)
+        assert failed.returncode != 0, (
+            f"the {defect.name} defect must fail mise run check\n"
+            f"{failed.stdout}\n{failed.stderr}"
+        )
     finally:
-        test_path.write_text(original_test, encoding="utf-8")
-        main_path.write_text(original_main, encoding="utf-8")
+        path.write_text(original, encoding="utf-8")
 
-    restored = _run_ok((mise, "run", "check"), cwd=destination)
-    assert "ERROR" not in restored.stdout
+    assert path.read_text(encoding="utf-8") == original
+    _run_ok((mise, "run", "check"), cwd=destination)
 
 
 def test_check_rejects_invalid_specification(generated_project: GeneratedProject) -> None:

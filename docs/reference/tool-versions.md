@@ -109,7 +109,7 @@ interpreter.
 | `mise run docs-serve` | `uv run --locked zensical serve` |
 | `mise run check` | `mise run lock-check`, `mise run examples-check`, `mise run spec-check`, then `mise run docs` |
 | `mise run spec-check` | `openspec validate --all --strict --no-interactive` |
-| `mise run test-template` | `uv run --locked pytest tests/` — the project generation integration test |
+| `mise run test-template` | `uv run --locked pytest tests/` — generation, overlay update and CI workflow tests |
 | `mise run lock-check` | `uv lock --check` |
 | `mise run examples-check` | parses the JSON and TOML agent configuration examples |
 | `mise run versions` | prints every pinned version |
@@ -117,7 +117,17 @@ interpreter.
 `check` contains only the checks that exist for this repository. `spec-check` is
 OpenSpec's own validation of `openspec/specs/` and `openspec/changes/`; `test-template`
 is kept separate because it installs a project's own dependencies from the package
-index, so CI is expected to run both.
+index, so CI runs both. See [Continuous integration](continuous-integration.md) for
+the workflow that does.
+
+## Test modules
+
+| Module | Covers |
+|---|---|
+| `tests/test_template.py` | project generation, ownership, lockfiles, interpreter identity, OpenSpec integration, six deliberate defects |
+| `tests/test_update_lifecycle.py` | native `copier update` between two temporary tagged revisions: application and documentation survival, conflict reporting, provenance |
+| `tests/test_ci_workflow.py` | the workflow's triggers, permissions, action pins, command sequence and absence of secrets |
+| `tests/testkit.py` | the subprocess helpers and release facts the modules share |
 
 ## Project overlay
 
@@ -125,7 +135,8 @@ index, so CI is expected to run both.
 |---|---|
 | `copier.yml` | template settings (`_subdirectory`) and the two documentation questions |
 | `templates/python-script-overlay/template/` | the rendered overlay: `AGENTS.md`, `mise.toml`, `ruff.toml`, `mypy.ini`, `pytest.ini`, `zensical.toml`, `README.md`, `docs/`, `tests/`, `.gitignore`, `.copier-answers.yml` |
-| `tests/test_template.py` | generation integration test behind `mise run test-template` |
+| `tests/` | the integration tests behind `mise run test-template`; see [Test modules](#test-modules) |
+| `.github/workflows/verify.yml` | read-only CI that runs the same mise tasks; see [Continuous integration](continuous-integration.md) |
 
 The overlay never renders `main.py`, `pyproject.toml`, `uv.lock` or
 `.python-version`. The full reference is

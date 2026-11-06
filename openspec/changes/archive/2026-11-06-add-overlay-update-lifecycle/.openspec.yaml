@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-11-06
+goal: Prove that native Copier updates preserve project-owned work and that CI
+  runs the same verification as local development

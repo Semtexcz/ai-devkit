@@ -1,0 +1,65 @@
+# Verification for ai-devkit.
+#
+# Read-only by design. This workflow checks the repository and runs the same
+# mise tasks a developer runs locally; it holds no credentials, calls no model
+# and does not publish, tag or commit anything. The reasoning and the failure
+# procedure are in docs/reference/continuous-integration.md and
+# docs/how-to/diagnose-ci-failure.md.
+name: verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# The token is read-only: every step reads the checkout and nothing else.
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify (ubuntu-24.04)
+    runs-on: ubuntu-24.04
+    # The integration test creates a project and installs its dependencies, so
+    # the job is slower than `mise run check` alone but still bounded.
+    timeout-minutes: 45
+    steps:
+      - name: Check out the repository
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          # No Git credential is left in .git/config for later steps.
+          persist-credentials: false
+
+      - name: Install the pinned mise version
+        # jdx/mise-action v5.2.6. It installs mise 2026.11.1 and restores its
+        # tool cache, whose key is a hash of mise.toml and mise.lock, so the
+        # cache invalidates with the lockfile and a cache miss installs exactly
+        # the same tuple. `install: false` keeps the install below explicit.
+        uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c
+        with:
+          version: 2026.11.1
+          install: false
+
+      - name: Trust the reviewed mise configuration
+        run: mise trust
+
+      - name: Install the locked toolchain
+        run: |
+          mise install --locked
+          mise exec -- uv sync --locked
+
+      - name: Print the installed versions
+        run: mise run versions
+
+      - name: Run the repository checks
+        run: mise run check
+
+      - name: Run the generation and update integration test
+        run: mise run test-template
+
+      - name: Confirm verification changed no tracked file
+        run: |
+          git status --short
+          test -z "$(git status --porcelain)"

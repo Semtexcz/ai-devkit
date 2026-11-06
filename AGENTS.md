@@ -49,9 +49,13 @@ Portable: no host-specific paths, no required agent, model or provider. See
 - `mise run check` runs `lock-check`, `examples-check`, `spec-check` and `docs`.
   `spec-check` is the native command `openspec validate --all --strict
   --no-interactive`; never replace it with a custom parser.
-- `mise run test-template` is the generation integration test. It needs the package
-  index and is therefore kept out of `check`; run both before reporting a change
-  that touches the overlay.
+- `mise run test-template` is the generation integration and update lifecycle test.
+  It needs the package index and is therefore kept out of `check`; run both before
+  reporting a change that touches the overlay or the tests.
+- `.github/workflows/verify.yml` runs the same commands with `contents: read` and no
+  secret. Keep it that way: no write permission, no `pull_request_target`, no
+  credential, no model call and no publish step. `tests/test_ci_workflow.py` guards
+  those properties.
 
 ## OpenSpec integration boundary
 

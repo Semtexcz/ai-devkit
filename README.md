@@ -18,7 +18,7 @@ Custom code is the last resort.
 
 ## Status
 
-Implemented and verified on Linux x86-64 (Tasks 1–5 of the
+Implemented and verified on Linux x86-64 (Tasks 1–6 of the
 [approved implementation plan](docs/plans/ai-devkit-v0.1.md)):
 
 - an engineering contract in `AGENTS.md` and two architecture decision records;
@@ -35,20 +35,29 @@ Implemented and verified on Linux x86-64 (Tasks 1–5 of the
   documentation and ignore rules. It never renders application code,
   `pyproject.toml`, `uv.lock` or `.python-version`;
 - OpenSpec initialized natively with `openspec init --tools opencode,codex --profile
-  core`: `openspec/specs/` holds one real behavioral specification, and OpenSpec's own
+  core`: `openspec/specs/` holds real behavioral specifications, and OpenSpec's own
   OpenCode and Codex integrations live in `.opencode/` and `.agents/`;
 - `mise run check` includes the native `openspec validate --all --strict
   --no-interactive`, and a generated project's check runs the same command;
 - a generation integration test (`mise run test-template`) that creates a project
   with spaces in its path, installs the exact baseline dependencies, initializes
   OpenSpec with the project's own pinned CLI, runs the application and its smoke
-  test, proves an invalid specification fails the check, and executes one complete
-  change lifecycle from `examples/openspec-change/`;
+  test, proves each of the six failure modes the contract names fails the check for
+  its own reason, and executes one complete change lifecycle from
+  `examples/openspec-change/`;
+- native `copier update` lifecycle tests between two temporary tagged overlay
+  revisions: an edited application, a project regression test, `pyproject.toml`,
+  `uv.lock` and project documentation survive; a same-region edit to `AGENTS.md`
+  stays visible, resolvable and reviewable; `.copier-answers.yml` advances without
+  rewriting anything else;
+- a read-only GitHub Actions workflow that installs the locked toolchain and runs
+  the same mise tasks, then fails if verification changed a tracked file;
 - a Zensical documentation site with strict internal-link validation, exposed as
   `mise run docs`, `mise run docs-serve` and `mise run check`.
 
-Not implemented yet: CI and Copier update lifecycle testing (Task 6) and
-clean-machine validation (Task 7). Nothing else is claimed to work.
+Not implemented yet: clean-machine validation (Task 7). Hosted CI has not been
+observed on GitHub yet, so its status is **pending**, not passed; the workflow's
+properties are covered by tests, its execution is not.
 
 Agent configuration is native to each harness, so no model or provider is a
 dependency of the devkit, and no check makes a paid model request.
@@ -97,7 +106,7 @@ step-by-step version, including checksum verification.
 | Optional agent | Cline + DeepSeek | documented, interface-driven |
 | Agent configuration | each harness, natively | documented, not automated |
 | Agent instructions | AGENTS.md | implemented |
-| CI | GitHub Actions | planned |
+| CI | GitHub Actions | implemented (Task 6), hosted run pending |
 
 ## Initial focus
 
@@ -124,15 +133,18 @@ The documentation site uses Diátaxis and is built with Zensical
 - [Install the development toolchain](docs/how-to/install-toolchain.md) — install, update, roll back.
 - [Initialize OpenSpec in a project](docs/how-to/initialize-openspec.md) — native init, another agent integration, generated-file updates.
 - [Validate changes and specifications](docs/how-to/validate-openspec.md) — the native command and the common validation failures.
-- [Update a project's overlay](docs/how-to/update-project-overlay.md) — the native Copier update procedure.
+- [Update a project's overlay](docs/how-to/update-project-overlay.md) — the native Copier update procedure and conflict resolution.
+- [Diagnose a failed CI job](docs/how-to/diagnose-ci-failure.md) — reproduce it locally and read the failure.
 - [Configure coding agents](docs/how-to/configure-coding-agents.md) — OpenCode with DeepSeek, Codex with ChatGPT, optional Cline.
 - [Troubleshoot agent setup](docs/how-to/troubleshoot-agent-setup.md) — missing credentials, rejected model identifiers.
 - [Tool ownership and pinned versions](docs/reference/tool-versions.md) — the tested version tuple.
-- [Generated project: commands and contents](docs/reference/generated-project.md) — what the overlay renders and what it runs.
+- [Generated project: commands and contents](docs/reference/generated-project.md) — what the overlay renders, what it runs and what it proves.
+- [Continuous integration](docs/reference/continuous-integration.md) — triggers, permissions, pinned actions, limitations.
 - [OpenSpec: commands, generated files and validation](docs/reference/openspec.md) — paths, owners, workflows and harness syntax.
 - [Agent configuration](docs/reference/agent-configuration.md) — locations, precedence, credentials, verified capabilities.
 - [Reproducibility and Python ownership](docs/explanation/reproducibility.md) — why mise and uv are separate.
 - [Who owns which file in a generated project](docs/explanation/generated-project-ownership.md) — uv versus Copier versus mise versus OpenSpec.
+- [Why verification and updates share one command](docs/explanation/verification-and-updates.md) — one definition of correct, reviewed updates, independent files.
 - [OpenSpec, AGENTS.md and ADRs](docs/explanation/openspec-and-agents.md) — requirements, tasks, standards and rationale.
 - [Why agent configuration stays native](docs/explanation/agent-independence.md) — no router, separate billing paths.
 - [ADR 0001](docs/explanation/decisions/0001-minimal-devkit.md) — design rationale.

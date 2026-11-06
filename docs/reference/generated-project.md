@@ -9,7 +9,8 @@ the generated project's tasks run. The creation procedure is the
 ```text
 copier.yml                                   Copier settings and the two questions
 templates/python-script-overlay/template/    the rendered overlay (nothing else is rendered)
-tests/test_template.py                       generation integration test
+tests/                                       generation, update lifecycle and CI workflow tests
+.github/workflows/verify.yml                 read-only verification on GitHub Actions
 ```
 
 `copier.yml` sets `_subdirectory` to the template directory, so the rest of the
@@ -150,23 +151,49 @@ asserts:
 8. provenance is recorded, including a tag from a temporary tagged repository;
 9. the project is independent: its own `.venv`, its own `uv.lock` and `mise.lock`, no
    `.python-version`, no workspace membership, no agent credentials or model settings;
-10. a deliberately broken test and a lint violation each make `mise run check` fail,
-    and the fixture is restored afterwards;
-11. a deliberately invalid specification makes `mise run check` fail and the restored
-    valid state passes again;
-12. the worked example in `examples/openspec-change/` runs the full lifecycle in the
+10. each of six deliberate defects fails `mise run check`, and each is reported by
+    the task that owns the checker rather than by a neighbouring one: a Ruff lint
+    violation (`mise run lint`), a Ruff formatting violation
+    (`mise run format-check`), a `mypy --strict` violation (`mise run typecheck`), a
+    failing test (`mise run test`), a broken internal documentation link
+    (`mise run docs`) and an invalid OpenSpec specification (`mise run spec-check`).
+    The fixture is restored after every case and the restored project passes again;
+11. the worked example in `examples/openspec-change/` runs the full lifecycle in the
     project — propose, validate, implement, test, document, validate, `mise run check`,
     mark tasks complete, archive — and the archived project still passes its check;
-13. Copier answers containing double quotes, backslashes, Unicode and newlines render
+12. Copier answers containing double quotes, backslashes, Unicode and newlines render
     a `zensical.toml` that `tomllib` parses back to the original answers, so no
     punctuation has to be forbidden in a project name or description;
-14. the devkit working tree is unchanged by the run.
+13. native `copier update` between two temporary tagged revisions (`v0.1.0` and
+    `v0.2.0`) preserves an edited `main.py`, a project regression test,
+    `pyproject.toml` and `uv.lock` byte for byte, and the updated project still passes
+    its check;
+14. the same update preserves a project-owned documentation page, its link from the
+    documentation entry point, and the project's own edit to an overlay-owned page
+    the template did not change;
+15. a project edit to the same region of `AGENTS.md` that the newer revision changes
+    produces inline conflict markers, unmerged Git stages and both sides' text; after
+    a hand resolution that keeps both, the project passes its check and the update
+    commits as one change;
+16. the update advances `_commit` in `.copier-answers.yml`, keeps `_src_path` pointing
+    at the template repository, leaves the project's answers unchanged, rewrites only
+    the files the template changed, and is reported as up to date by
+    `copier check-update`;
+17. the devkit working tree is unchanged by the run.
 
-The overlay never copies this repository's `mise.lock` into a project. A lock
-describes the platform it was created on, so the generated project runs
-`mise lock` once and commits the result; the split between the two lockfiles is
+The update scenarios run in copies of one prepared project: creating and locking a
+project is the expensive part, while each scenario needs its own committed tree.
+The slow per-scenario step is `uv sync --locked`, which rebuilds `.venv` from the
+copy's own lockfile.
+
+The never-rendered rule is what makes items 13–16 possible: an update cannot
+overwrite a file the template never produces. The overlay never copies this
+repository's `mise.lock` into a project either: a lock describes the platform it
+was created on, so the generated project runs `mise lock` once and commits the
+result. The split between the two lockfiles is
 [Reproducibility](../explanation/reproducibility.md).
 
 `test-template` is not part of `mise run check`: it installs packages from the
 package index, downloads the locked toolchain archives and is the slower
-integration gate. CI is expected to run both.
+integration gate. CI runs both; see
+[Continuous integration](continuous-integration.md).

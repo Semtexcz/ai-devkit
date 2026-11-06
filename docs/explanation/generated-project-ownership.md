@@ -103,5 +103,9 @@ Not covered, and not claimed:
   `uv.lock`; two projects created minutes apart can differ where the index moved.
   That is why the baseline is recorded as exact versions rather than promised as a
   byte-identical artifact.
-- **Template update conflicts.** Copier's conflict handling is native and reviewed
-  by a human. Lifecycle testing of conflicting edits is deferred to a later task.
+- **Automatic conflict resolution.** Copier's conflict handling is native and
+  reviewed by a human. The lifecycle test proves that a same-region edit produces
+  visible markers and unmerged Git stages and that a hand resolution passes the
+  check; it does not claim that either side is chosen automatically, because neither
+  is. See
+  [Why verification and updates share one command](verification-and-updates.md).

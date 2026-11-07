@@ -120,6 +120,7 @@ OVERLAY_FILES = (
     ".copier-answers.yml",
     ".gitignore",
     "AGENTS.md",
+    "CHANGELOG.md",
     "README.md",
     "docs/explanation/ownership.md",
     "docs/how-to/add-a-dependency.md",
@@ -419,6 +420,35 @@ def test_overlay_owns_no_application_code_or_manifest(
         parts = set(path.relative_to(template_root).parts)
         assert not parts & AGENT_INTEGRATION_DIRECTORIES, f"overlay copies {path}"
     assert not (destination / ".python-version").exists()
+
+
+def test_generated_project_carries_the_changelog_policy(
+    generated_project: GeneratedProject,
+) -> None:
+    """Scenario B: the overlay seeds a changelog and the rule that maintains it."""
+    destination = generated_project.destination
+
+    agents = (destination / "AGENTS.md").read_text(encoding="utf-8")
+    assert "## Changelog" in agents
+    assert "`CHANGELOG.md`" in agents
+    # The rule is part of the Definition of Done, not an optional nicety.
+    definition_of_done = re.search(
+        r"^- `CHANGELOG\.md` records the change", agents, re.MULTILINE
+    )
+    assert definition_of_done, agents
+
+    changelog = (destination / "CHANGELOG.md").read_text(encoding="utf-8")
+    # A seed, not a history: one empty unreleased section and no invented release.
+    assert changelog.startswith("# Changelog\n"), changelog
+    empty_unreleased = re.search(
+        r"^## \[Unreleased\]\n\n### Added\n\n### Changed\n\n### Fixed\n",
+        changelog,
+        re.MULTILINE,
+    )
+    assert empty_unreleased, changelog
+    assert not re.search(r"^## \[\d", changelog, re.MULTILINE), (
+        "the rendered changelog invents a release"
+    )
 
 
 def test_copier_provenance_is_recorded(

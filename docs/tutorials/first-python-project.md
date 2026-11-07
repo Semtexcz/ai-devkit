@@ -70,17 +70,19 @@ mise exec -- uv run --locked copier copy --vcs-ref HEAD --defaults \
   "$devkit" "$HOME/projects/my script"
 ```
 
-`--vcs-ref HEAD` renders the current checkout. Use a tagged release instead once
-one exists:
+`--vcs-ref HEAD` renders the current checkout. For a project you intend to update later,
+use the release tag instead:
 
 ```bash
 mise exec -- uv run --locked copier copy --vcs-ref v0.1.0 --defaults \
   gh:Semtexcz/ai-devkit "$HOME/projects/my script"
 ```
 
-ai-devkit has no release tag yet, so the `gh:` form is documented but unverified;
-the tag mechanism itself is exercised by `mise run test-template`, which builds a
-temporary tagged repository.
+The `gh:` form resolves the published `v0.1.0` tag. From a local clone the same reference
+works, once it exists there:
+`copier copy --vcs-ref v0.1.0 "$devkit" "$HOME/projects/my script"`. The tag mechanism
+itself is exercised by `mise run test-template`, which builds a temporary tagged
+repository.
 
 !!! warning "Use a tag for projects you intend to update"
     `--vcs-ref HEAD` renders the working tree as it is now. If that tree has
@@ -244,7 +246,7 @@ also the prerequisite for later [Copier updates](../how-to/update-project-overla
 |---|---|
 | `uv init` and uv | `main.py`, `pyproject.toml`, `uv.lock`, `.venv/` |
 | mise | `mise.toml`, `mise.lock`, the tasks |
-| Copier overlay | `AGENTS.md`, checker configuration, `docs/`, `tests/`, `.gitignore`, `.copier-answers.yml` |
+| Copier overlay | `AGENTS.md`, `CHANGELOG.md`, checker configuration, `docs/`, `tests/`, `.gitignore`, `.copier-answers.yml` |
 | OpenSpec | `openspec/`, `.opencode/`, `.agents/` |
 
 Read [Who owns which file](../explanation/generated-project-ownership.md) for the
@@ -256,9 +258,9 @@ version. The next step is a real change:
 ## Known limitations
 
 - Linux x86-64 is the only verified platform; `mise.lock` covers `linux-x64`.
-- No ai-devkit release tag exists yet, so only the `--vcs-ref HEAD` form of the Copier
-  command has been run in this repository. Tag-based provenance is verified with a
-  temporary tagged repository.
+- The recommended reference is the release tag `v0.1.0`; only the `--vcs-ref HEAD` form of
+  the Copier command has been run inside this repository. Tag-based provenance is verified
+  with a temporary tagged repository by `mise run test-template`.
 - The project is an unpackaged application; there is no build backend and nothing is
   published.
 - OpenSpec validation passes vacuously while `openspec/specs/` is empty. That is

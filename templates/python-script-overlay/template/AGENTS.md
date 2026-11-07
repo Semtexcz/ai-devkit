@@ -20,6 +20,7 @@ dependency only when it removes more code than it adds, and record it with
 | Python interpreter, uv, Node.js and OpenSpec versions, tasks | `mise.toml` |
 | `pyproject.toml`, `uv.lock`, `.venv/`, `main.py` | uv and this project |
 | `AGENTS.md`, checker configuration, documentation seeds | the Copier overlay |
+| `CHANGELOG.md` | this project, after the overlay seeded it once |
 | `openspec/` specifications and proposed changes | OpenSpec, driven by this project |
 | `.opencode/`, `.agents/` integration files | OpenSpec's `init` and `update` commands |
 | Application behavior | you |
@@ -66,6 +67,20 @@ backlog: do not add a task file outside `openspec/`.
   link.
 - Record a significant decision as a short page under `docs/explanation/`.
 
+## Changelog
+
+`CHANGELOG.md` records this project's notable changes, and it is the only
+changelog: do not add a second one.
+
+- Record user-visible features, behavior changes and important fixes under
+  `[Unreleased]` as part of the change that causes them.
+- Skip formatting, typo and internal-refactor work; if you record nothing, say why.
+- When you release a version, move the entries into a new version section, date it
+  and leave `[Unreleased]` in place, empty.
+
+The overlay seeded the file once. It is yours now, and `copier update` preserves the
+entries you add, so never re-seed or overwrite it from the template.
+
 ## Definition of Done
 
 A change is complete when:
@@ -74,6 +89,7 @@ A change is complete when:
 - `mise run check` passes;
 - tests cover the new behavior;
 - documentation reflects the change;
+- `CHANGELOG.md` records the change, or you state why no entry is needed;
 - the diff contains no secrets, unrelated changes or unresolved conflicts.
 
 ## Security

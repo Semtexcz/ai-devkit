@@ -43,7 +43,7 @@ nav = [
     { "ai-devkit v0.1 implementation plan" = "plans/ai-devkit-v0.1.md" },
   ] },
   { "Releases" = [
-    { "v0.1.0 release candidate" = "releases/v0.1.0.md" },
+    { "v0.1.0 release notes" = "releases/v0.1.0.md" },
     { "v0.1.0 acceptance report" = "releases/v0.1.0-acceptance-report.md" },
   ] },
 ]

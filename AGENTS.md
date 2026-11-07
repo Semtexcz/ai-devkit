@@ -103,6 +103,29 @@ Portable: no host-specific paths, no required agent, model or provider. See
   authenticate them.
 - See the [agent configuration reference](docs/reference/agent-configuration.md).
 
+## Changelog
+
+`CHANGELOG.md` is the only changelog. It follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and semantic versioning,
+with an `Added`, a `Changed` and a `Fixed` section under each version.
+
+- Decide, before reporting a task complete, whether the change affects the
+  changelog, and say so either way.
+- Record user-visible features, behavior changes, breaking changes, compatibility
+  changes, significant toolchain changes, deprecations and important fixes under
+  `[Unreleased]`.
+- Do not record formatting changes, typo fixes, ordinary refactors or other work
+  with no user-visible effect, and do not duplicate an entry that is already there.
+  If no entry is required, state the reason in the completion report.
+- When preparing a release, move the relevant entries from `[Unreleased]` into the
+  new version section, date that section, and leave `[Unreleased]` in place, empty.
+- Never record a speculative or unverified claim, and never describe an
+  undocumented user-visible change as complete.
+- Keep one canonical owner: do not add a second release history next to this file
+  and do not copy the changelog into `docs/`.
+
+Changelog maintenance is part of the Definition of Done.
+
 ## Definition of Done
 
 A task is complete when:
@@ -110,6 +133,8 @@ A task is complete when:
 - the requested behavior is implemented;
 - the appropriate checks pass;
 - relevant documentation and specifications are updated;
+- the change is recorded in `CHANGELOG.md`, or the completion report states why no
+  entry is required;
 - important architectural decisions are documented in an ADR;
 - no unrelated changes, secrets or merge conflicts are introduced;
 - verification results and limitations are reported.

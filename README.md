@@ -57,10 +57,17 @@ Implemented and verified on Linux x86-64 (Tasks 1–6 of the
 
 Task 7 replays the documented installation and project-creation journey on a
 disposable Ubuntu 24.04.5 x86-64 machine and records the evidence in the
-[v0.1.0 acceptance report](docs/releases/v0.1.0-acceptance-report.md). Hosted CI has
-run green on the reviewed commit. The two live agent acceptance tests still need a
-user-authorised authenticated session, so they are reported as **pending** and v0.1.0
-remains a release candidate: see the [v0.1.0 release notes](docs/releases/v0.1.0.md).
+[v0.1.0 acceptance report](docs/releases/v0.1.0-acceptance-report.md). Hosted CI has run
+green on the reviewed commits. Live agent acceptance was supplied by the user, who ran
+one bounded task with OpenCode + DeepSeek Flash and one review with Codex + ChatGPT in a
+generated project; the report records those sessions as *user-provided* and states what
+they do and do not establish.
+
+v0.1.0 is the first stable release. Its notes are in
+[docs/releases/v0.1.0.md](docs/releases/v0.1.0.md), and the changes are listed once, in
+[CHANGELOG.md](CHANGELOG.md). **The `v0.1.0` tag is created by a human**, following the
+[publication procedure](docs/releases/v0.1.0.md#publish-the-release-tag); no automated
+change creates, moves or pushes a release tag.
 
 Agent configuration is native to each harness, so no model or provider is a
 dependency of the devkit, and no check makes a paid model request.
@@ -80,6 +87,26 @@ mise run check                   # locked deps, agent examples, specs, strict do
 mise itself is installed manually; see
 [docs/tutorials/getting-started.md](docs/tutorials/getting-started.md) for the
 step-by-step version, including checksum verification.
+
+## Create a project
+
+The overlay is a Copier template. Render it from the release tag:
+
+```bash
+mise exec -- uv run --locked copier copy --vcs-ref v0.1.0 --defaults \
+  gh:Semtexcz/ai-devkit "$HOME/projects/my script"
+```
+
+`--vcs-ref v0.1.0` is the stable reference for a project that should later receive
+overlay updates. `--vcs-ref HEAD` renders the current checkout instead and stays
+documented as a development-only alternative: on a dirty tree it records a synthetic
+commit that a later `copier update` cannot resolve.
+
+An existing project applies a newer overlay with `copier update --vcs-ref <tag>
+"<path>"`; the procedure and the conflict review are in
+[docs/how-to/update-project-overlay.md](docs/how-to/update-project-overlay.md), and the
+end-to-end walkthrough is
+[docs/tutorials/first-python-project.md](docs/tutorials/first-python-project.md).
 
 ## Toolchain ownership
 
@@ -153,6 +180,16 @@ The documentation site uses Diátaxis and is built with Zensical
 - [ADR 0001](docs/explanation/decisions/0001-minimal-devkit.md) — design rationale.
 - [ADR 0002](docs/explanation/decisions/0002-script-project-overlay.md) — overlay scope and provenance.
 - [ai-devkit v0.1 plan](docs/plans/ai-devkit-v0.1.md) — scope and backlog.
-- [v0.1.0 release candidate](docs/releases/v0.1.0.md) — what v0.1 delivers, what is deferred, how a tag would be created.
-- [v0.1.0 acceptance report](docs/releases/v0.1.0-acceptance-report.md) — per-scenario evidence, environments and pending live tests.
-- [AGENTS.md](AGENTS.md) — engineering rules for agents and humans.
+- [v0.1.0 release notes](docs/releases/v0.1.0.md) — what v0.1 delivers, what it does not, and how the release tag is published.
+- [v0.1.0 acceptance report](docs/releases/v0.1.0-acceptance-report.md) — per-scenario evidence, environments and the user-provided live sessions.
+- [CHANGELOG.md](CHANGELOG.md) — notable changes, in Keep a Changelog form.
+- [LICENSE](LICENSE) — MIT.
+- [AGENTS.md](AGENTS.md) — engineering rules for agents and humans, including the changelog policy.
+
+## Licence
+
+ai-devkit is released under the [MIT licence](LICENSE).
+
+Generating a project from this template does not decide that project's licence. The
+overlay renders engineering policy, not legal terms, so a generated project starts
+without a licence file and choosing one is the project developer's decision.

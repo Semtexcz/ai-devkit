@@ -10,7 +10,7 @@ steps are in [Configure coding agents](configure-coding-agents.md).
 | Symptom | Cause | Fix |
 |---|---|---|
 | `Provider not found: deepseek` from `opencode models deepseek` | That shell has no DeepSeek credential | Complete `/connect` (or `opencode auth login`), or export `DEEPSEEK_API_KEY` in this shell; `opencode auth list` shows whether a credential is stored |
-| OpenCode answers with a model you did not select | `model` is unset in the effective config, or `-m` selected another one | Compare `opencode debug config` with what you expect |
+| OpenCode answers with a model you did not select | `model` is unset in the effective config, or `--model` selected another one | Compare `opencode debug config` with what you expect |
 | Codex reports `401 Unauthorized` and retries | No ChatGPT login in this `CODEX_HOME` | Run `codex login`, then confirm with `codex login status` |
 | `codex login status` reports an API key but you expect a subscription | `codex login --with-api-key` was run, or `OPENAI_API_KEY` is exported | `codex logout`, unset the variable, run `codex login` again |
 | Cline answers with another provider | The provider or model dropdown is not DeepSeek | Check the approval header, which names the provider and model |

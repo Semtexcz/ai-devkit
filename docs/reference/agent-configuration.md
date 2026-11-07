@@ -83,14 +83,15 @@ harnesses, not a devkit policy.
 |---|---|---|---|
 | Default from configuration | `model` as `provider/model` | `model` in user config or profile | No file; the selected model in settings |
 | Auxiliary model | `small_model` | Not documented | Not documented |
-| Per-run override | `-m provider/model` | `-m <model>`, `-c model=<model>` | Per-task model choice in the interface |
+| Per-run override | `--model provider/model` on `opencode` or `opencode run` | `-m <model>`, `-c model=<model>` | Per-task model choice in the interface |
 | Interactive switch | `/models` | `/model` in the session | Model dropdown |
 | Identifier check | `opencode models [provider]` | `codex debug models` | Model dropdown |
 | Credential check | `opencode auth list` | `codex login status` | Provider settings panel |
 | Provider selection | Credential plus `provider/model` | `model_provider` in user config | API Provider dropdown |
 
-OpenCode resolves the model to use in this order: the `-m` flag, then `model`
-from the merged config, then the last used model, then an internal priority.
+OpenCode resolves the model to use in this order: the `--model` flag (short form
+`-m`), then `model` from the merged config, then the last used model, then an
+internal priority.
 
 ## Verified identifiers
 

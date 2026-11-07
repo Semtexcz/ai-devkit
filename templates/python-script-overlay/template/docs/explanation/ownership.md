@@ -13,7 +13,12 @@ code, and why `pyproject.toml` is never edited by the template.
 | mise | interpreter, tool versions, tasks | `mise.toml`, `mise.lock` |
 | Copier overlay | standards and documentation seeds | `AGENTS.md`, `ruff.toml`, `mypy.ini`, `pytest.ini`, `zensical.toml`, `docs/`, `tests/`, `.gitignore`, `.copier-answers.yml` |
 | OpenSpec `init` (ongoing) | specifications, change checklists, agent integrations | `openspec/`, `.opencode/`, `.agents/` |
-| You | application behavior and the specifications you write | `main.py`, `openspec/specs/`, `openspec/changes/` |
+| You | application behavior and the specifications you write | `main.py`, `openspec/specs/`, `openspec/changes/`, `CHANGELOG.md` |
+
+`CHANGELOG.md` is the one file the overlay seeds and then hands over. It arrives with
+an empty `[Unreleased]` section, and from that moment the project owns it: an overlay
+update replays the difference between template revisions, so the template's copy
+never overwrites the entries you add.
 
 ## Why the overlay does not own `pyproject.toml`
 

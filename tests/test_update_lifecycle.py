@@ -145,6 +145,17 @@ PROJECT_INDEX_LINK = """
 - [Keep a changelog](how-to/keep-a-changelog.md) — owned by this project.
 """
 
+# What the project records in the changelog the overlay seeded: a release the
+# template never knew about. It is appended under the seeded `[Unreleased]`
+# section, the way a project records its first version.
+PROJECT_CHANGELOG_ENTRY = """
+## [0.1.0] - 2026-11-07
+
+### Added
+
+- A `--name` argument, so the greeting can be personalised.
+"""
+
 # Git identity for Copier's own scratch repositories, so the test does not depend
 # on a host- or CI-wide `user.name`/`user.email`. Environment variables apply to
 # one subprocess tree and write no configuration anywhere.
@@ -500,6 +511,46 @@ def test_project_owned_documentation_survives_update(
         encoding="utf-8"
     )
     run_ok((executable("mise"), "run", "docs"), cwd=destination)
+    _run_checks(updatable_project)
+
+
+def test_project_changelog_entries_survive_update(
+    updatable_project: UpdatableProject,
+) -> None:
+    """Scenario B: an overlay update never rewrites the project's changelog.
+
+    The overlay seeds `CHANGELOG.md` once and then hands it over. Because the
+    template's copy is identical in both tagged revisions, an update has nothing
+    to apply to it, so the entries the project added must survive byte for byte.
+    """
+    destination = updatable_project.destination
+    changelog = destination / "CHANGELOG.md"
+
+    # The seed arrived from the overlay, with an empty unreleased section.
+    seeded = changelog.read_text(encoding="utf-8")
+    assert "## [Unreleased]" in seeded, seeded
+
+    # The project records its own release and commits it.
+    _append(changelog, PROJECT_CHANGELOG_ENTRY)
+    entry_before = changelog.read_text(encoding="utf-8")
+    assert PROJECT_CHANGELOG_ENTRY.strip() in entry_before
+    _commit(destination, "project: record a changelog entry")
+
+    result = _update_overlay(updatable_project)
+    assert result.returncode == 0, _failure_detail(result)
+
+    # The overlay change landed, so the assertions below are not vacuous.
+    assert TEMPLATE_AGENTS_SECTION in (destination / "AGENTS.md").read_text(
+        encoding="utf-8"
+    )
+
+    # Nothing the project wrote was rewritten or lost.
+    assert changelog.read_text(encoding="utf-8") == entry_before
+    changed = {
+        line[3:] for line in _git(destination, "status", "--porcelain").splitlines()
+    }
+    assert "CHANGELOG.md" not in changed, changed
+    assert "CHANGELOG.md" not in EXPECTED_UPDATE_PATHS
     _run_checks(updatable_project)
 
 

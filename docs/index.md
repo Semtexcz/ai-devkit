@@ -31,10 +31,13 @@ Implemented and verified in this repository:
 
 Clean-machine acceptance (**Task 7**) replays the same journey on a disposable
 Ubuntu 24.04.5 x86-64 machine; the evidence is in the
-[v0.1.0 acceptance report](releases/v0.1.0-acceptance-report.md). Hosted CI runs
-green on the reviewed commit. The two live agent acceptance tests need a
-user-authorised authenticated session, so they are **pending**, and v0.1.0 is a
-[release candidate](releases/v0.1.0.md) rather than an accepted release.
+[v0.1.0 acceptance report](releases/v0.1.0-acceptance-report.md). Hosted CI runs green on
+the reviewed commits, and live agent acceptance was supplied by the user, with OpenCode
+and DeepSeek Flash and with Codex and ChatGPT.
+
+**v0.1.0 is the first stable release**; its notes are in the
+[v0.1.0 release notes](releases/v0.1.0.md). The `v0.1.0` tag is created by a human, and
+the repository's changes are listed once, in `CHANGELOG.md` at the repository root.
 
 Agent configuration is documented, not automated: this repository ships examples
 and instructions, and each harness keeps its own credentials.
@@ -81,10 +84,12 @@ Repository records that are not tutorial content:
 - `examples/openspec-change/` — the worked example the tutorial and the integration
   test both use.
 - `openspec/` — this repository's own specifications and change history.
-- [v0.1.0 release candidate](releases/v0.1.0.md) — scope, limitations, deferred work
-  and the intended tagged-release procedure.
-- [v0.1.0 acceptance report](releases/v0.1.0-acceptance-report.md) — the evidence
-  behind every acceptance claim, including what is still pending.
+- [v0.1.0 release notes](releases/v0.1.0.md) — scope, limitations, what is deferred, the
+  licence and the tag-publication procedure.
+- [v0.1.0 acceptance report](releases/v0.1.0-acceptance-report.md) — the evidence behind
+  every acceptance claim, including what remains unestablished.
+- `CHANGELOG.md` (repository root) — notable changes, in Keep a Changelog form.
+- `LICENSE` (repository root) — MIT.
 
 Working with a coding agent starts with
 [Configure coding agents](how-to/configure-coding-agents.md); exact file

@@ -23,7 +23,8 @@ out `--vcs-ref`, and stores `_commit`.
 
 | Path | Purpose |
 |---|---|
-| `AGENTS.md` | engineering rules: reuse-first, small changes, documentation, security, Definition of Done |
+| `AGENTS.md` | engineering rules: reuse-first, small changes, documentation, changelog, security, Definition of Done |
+| `CHANGELOG.md` | a seed changelog with an empty `[Unreleased]` section; the project owns it afterwards |
 | `mise.toml` | pinned Python and uv, tasks, single-owner environment |
 | `ruff.toml` | lint and format policy only |
 | `mypy.ini` | `strict = True` type-checking policy only |
@@ -169,8 +170,9 @@ asserts:
     `pyproject.toml` and `uv.lock` byte for byte, and the updated project still passes
     its check;
 14. the same update preserves a project-owned documentation page, its link from the
-    documentation entry point, and the project's own edit to an overlay-owned page
-    the template did not change;
+    documentation entry point, the project's own edit to an overlay-owned page the
+    template did not change, and the entries the project added to the `CHANGELOG.md` the
+    overlay seeded;
 15. a project edit to the same region of `AGENTS.md` that the newer revision changes
     produces inline conflict markers, unmerged Git stages and both sides' text; after
     a hand resolution that keeps both, the project passes its check and the update

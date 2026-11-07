@@ -190,11 +190,11 @@ change to your verification standard, so it deserves an explicit look.
 
 ## Known limitations
 
-- ai-devkit has no release tag yet. Until one exists, `--vcs-ref HEAD` is the only
-  working reference, and a HEAD copy of a dirty working tree records a synthetic
-  commit rather than a released version. The update lifecycle is proven against
-  temporary tags built from this repository's template source, not against a
-  published release.
+- The reference you should use is the release tag (`--vcs-ref v0.1.0`).
+  `--vcs-ref HEAD` also works, but it renders a working tree rather than a released
+  version, and a HEAD copy of a dirty tree records a synthetic commit that a later
+  update cannot resolve. The update lifecycle is proven against temporary tags built
+  from this repository's template source, not against a published release.
 - The lifecycle is proven on Linux x86-64 with Copier 9.19.1, the version this
   devkit pins. Copier's conflict reporting is that release's behavior; a change in
   it fails the integration test rather than passing silently.

@@ -88,8 +88,12 @@ harness or changing its model explicitly — see
    ```
 
    `auth` is the command name in 1.19.5; `providers` is an alias for the same
-   command. Add `--provider deepseek` to skip the provider picker. The key is
-   stored in `~/.local/share/opencode/auth.json`, not in your config file. As an
+   command. Add `--provider deepseek` (short form `-p`) to skip the provider
+   picker. The positional argument is a *URL*, not a provider name, so
+   `opencode auth login deepseek` fails with `Failed to load auth provider
+   metadata from deepseek: fetch() URL is invalid` — name the provider with
+   `--provider` and let OpenCode prompt for the key. The key is stored in
+   `~/.local/share/opencode/auth.json`, not in your config file. As an
    alternative, export `DEEPSEEK_API_KEY` and OpenCode reads it from the
    environment.
 
@@ -144,8 +148,12 @@ keeps the key). If a later release removes it, delete the key — the explicit
 
 ### Change the OpenCode model
 
-- For one session: `opencode -m deepseek/deepseek-v4-pro`, or `/models` inside
-  the interface.
+- For one non-interactive run: `opencode run --model deepseek/deepseek-v4-pro
+  "…the prompt…"`. `run` executes one message and exits, which is the form a
+  script or a CI job can use.
+- For one interactive session: `opencode --model deepseek/deepseek-v4-pro`, or
+  `/models` inside the interface. `-m` is the short form of `--model` in both
+  commands; only the `run` form works without a terminal.
 - Permanently: edit `model` in the OpenCode config file that exists —
   `opencode.jsonc` takes precedence when both files are present.
 - For one project only: add `opencode.json` to that project's root. Project keys
@@ -316,7 +324,7 @@ shared `AGENTS.md` stays harness-agnostic: it states the rules, not the invocati
 
 | Change | Where |
 |---|---|
-| OpenCode model | `model` in the OpenCode config, `-m` for one run, or `opencode.json` in one project |
+| OpenCode model | `model` in the OpenCode config, `--model` on `opencode` or on `opencode run`, or `opencode.json` in one project |
 | OpenCode provider | Connect that provider's credentials, then set `provider/model` |
 | Codex model | `-m`, `-c model=...`, or `model` in a profile file |
 | Codex provider or account | User-level `~/.codex/config.toml` and `codex login` |

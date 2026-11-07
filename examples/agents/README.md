@@ -34,7 +34,7 @@ The three levels are separate, and only the first runs automatically:
 |---|---|---|
 | Syntax | `mise run examples-check`, a standard-library JSON and TOML parse | Automated |
 | CLI configuration | `opencode debug config` and `codex doctor` in a throwaway home | Verified against the pinned versions; manual |
-| Authenticated execution | `opencode run`, `codex exec` | Not tested; no paid request was made |
+| Authenticated execution | `opencode run --model …`, `codex exec` | Not run by this repository; the user's own sessions are recorded in the [v0.1.0 acceptance report](../../docs/releases/v0.1.0-acceptance-report.md#d2-user-provided-live-session-evidence) |
 
 `mise run examples-check` stays a parse check so that `mise run check` remains
 fast, offline and deterministic, and never touches a user configuration.

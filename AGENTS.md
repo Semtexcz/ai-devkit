@@ -29,8 +29,13 @@ Portable: no host-specific paths, no required agent, model or provider. See
 - The roadmap records direction, not scope. **It does not authorize implementation
   of any milestone after v0.1.** Starting a milestone is a human decision, and its
   actionable scope is an approved OpenSpec change.
+- Human authorization and an OpenSpec change record are different things. The human
+  approves consequential product scope, milestone implementation and releases.
+  OpenSpec is the authoritative specification and change system for behavioral
+  work. A roadmap item is never implementation authorization by itself, and never
+  read a future milestone as permission to begin work.
 - `docs/plans/ai-devkit-v0.1.md` is historical implementation documentation for
-  the delivered v0.1 baseline; it is not a live plan.
+  the implemented v0.1 baseline; it is not a live plan.
 
 ## Development workflow
 
@@ -42,6 +47,9 @@ Portable: no host-specific paths, no required agent, model or provider. See
   validated by the native CLI (`openspec new change`, `openspec validate`,
   `openspec archive`). Do not create a backlog, task-state file or workflow schema
   next to them.
+- Small documentation fixes, typo corrections and routine administrative
+  maintenance need no OpenSpec change unless they alter behavioral requirements or
+  approved scope.
 - `AGENTS.md` owns engineering rules, ADRs own architectural rationale, and
   OpenSpec owns what the system must do; see
   [OpenSpec, AGENTS.md and ADRs](docs/explanation/openspec-and-agents.md).
@@ -66,6 +74,10 @@ Portable: no host-specific paths, no required agent, model or provider. See
 - `mise run check` runs `lock-check`, `examples-check`, `spec-check` and `docs`.
   `spec-check` is the native command `openspec validate --all --strict
   --no-interactive`; never replace it with a custom parser.
+- A generated project's `mise run check` is a different and larger set: dependency
+  lock verification, Ruff lint, Ruff formatting, `mypy`, pytest, the strict
+  documentation build and OpenSpec validation. That is seven checks, not this
+  repository's four; never describe one set with the other's count.
 - `mise run test-template` is the generation integration and update lifecycle test.
   It needs the package index and is therefore kept out of `check`; run both before
   reporting a change that touches the overlay or the tests.

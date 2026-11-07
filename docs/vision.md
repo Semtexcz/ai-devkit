@@ -204,12 +204,12 @@ evidence, the honest statement is that the metric is unmeasured.
 
 ## Where this vision stands today
 
-v0.1.0 delivers the foundation the vision builds on: pinned tools, engineering
+v0.1.0 implements the foundation the vision builds on: pinned tools, engineering
 rules, one project overlay, OpenSpec as the requirement and change record,
 deterministic verification locally and in CI, and documentation. It does not
 deliver autonomy, orchestration, messaging, a dashboard, durable run state or
-unattended execution. The [roadmap](plans/roadmap.md) records the baseline and
-the gaps honestly, and
+unattended execution. The [roadmap](plans/roadmap.md) records the baseline, the
+gaps and the release status honestly, and
 [Lessons from `_ai_project_template`](explanation/lessons-from-ai-project-template.md)
 records which earlier experiments were kept, adapted or deliberately not
 repeated.

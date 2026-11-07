@@ -25,9 +25,9 @@ a human, authorizes what carries real consequence, and accepts delivered softwar
 - [docs/vision.md](docs/vision.md) — mission, the target autonomous lifecycle,
   human approval boundaries, ownership boundaries, non-goals and how success is
   measured.
-- [docs/plans/roadmap.md](docs/plans/roadmap.md) — the delivered v0.1 baseline and
-  the provisional milestones after it. Every milestone after v0.1 is a proposal,
-  not approved scope.
+- [docs/plans/roadmap.md](docs/plans/roadmap.md) — the implemented v0.1 baseline
+  and the provisional milestones after it. Every milestone after v0.1 is a
+  proposal, not approved scope.
 - [docs/explanation/lessons-from-ai-project-template.md](docs/explanation/lessons-from-ai-project-template.md)
   — what is retained, adapted, delegated, deferred or rejected from the earlier
   `_ai_project_template`.
@@ -196,11 +196,11 @@ The documentation site uses Diátaxis and is built with Zensical
 - [OpenSpec, AGENTS.md and ADRs](docs/explanation/openspec-and-agents.md) — requirements, tasks, standards and rationale.
 - [Why agent configuration stays native](docs/explanation/agent-independence.md) — no router, separate billing paths.
 - [Product vision](docs/vision.md) — mission, target autonomous lifecycle, human approval boundaries, non-goals and success measures.
-- [Roadmap](docs/plans/roadmap.md) — the delivered v0.1 baseline and the provisional milestones after it; milestones after v0.1 are not approved scope.
+- [Roadmap](docs/plans/roadmap.md) — the implemented v0.1 baseline and the provisional milestones after it; milestones after v0.1 are not approved scope.
 - [Lessons from `_ai_project_template`](docs/explanation/lessons-from-ai-project-template.md) — what was retained, adapted, delegated, deferred and rejected.
 - [ADR 0001](docs/explanation/decisions/0001-minimal-devkit.md) — design rationale.
 - [ADR 0002](docs/explanation/decisions/0002-script-project-overlay.md) — overlay scope and provenance.
-- [Historical ai-devkit v0.1 implementation plan](docs/plans/ai-devkit-v0.1.md) — the implementation record for the delivered baseline; its backlog is spent.
+- [Historical ai-devkit v0.1 implementation plan](docs/plans/ai-devkit-v0.1.md) — the implementation record for the implemented baseline; its backlog is spent.
 - [v0.1.0 release notes](docs/releases/v0.1.0.md) — what v0.1 delivers, what it does not, and how the release tag is published.
 - [v0.1.0 acceptance report](docs/releases/v0.1.0-acceptance-report.md) — per-scenario evidence, environments and the user-provided live sessions.
 - [CHANGELOG.md](CHANGELOG.md) — notable changes, in Keep a Changelog form.

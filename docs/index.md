@@ -82,7 +82,7 @@ Repository records that are not tutorial content:
   agents.
 - [Product vision](vision.md) — the mission, the target autonomous lifecycle,
   approval boundaries, ownership boundaries, non-goals and success measures.
-- [Roadmap](plans/roadmap.md) — the delivered v0.1 baseline and the provisional
+- [Roadmap](plans/roadmap.md) — the implemented v0.1 baseline and the provisional
   milestones after it. Milestones after v0.1 are not approved scope.
 - [Lessons from `_ai_project_template`](explanation/lessons-from-ai-project-template.md)
   — the decision matrix behind what was retained, adapted, delegated, deferred and
@@ -92,7 +92,7 @@ Repository records that are not tutorial content:
 - [ADR 0002](explanation/decisions/0002-script-project-overlay.md) — what the
   overlay may render and how provenance works.
 - [Historical ai-devkit v0.1 implementation plan](plans/ai-devkit-v0.1.md) — the
-  implementation record for the delivered baseline; its backlog is spent.
+  implementation record for the implemented baseline; its backlog is spent.
 - `examples/agents/` — credential-free OpenCode and Codex configuration
   examples, inert until copied.
 - `examples/openspec-change/` — the worked example the tutorial and the integration

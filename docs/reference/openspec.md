@@ -100,9 +100,11 @@ mise exec -- openspec validate --all --strict --no-interactive
 needs at least one scenario, and a new capability needs a `## Purpose` section.
 `--no-interactive` disables prompts so the command works in a task runner.
 
-The same command is the seventh entry in `mise run check` here and in a generated
-project (`mise run spec-check`). No custom parser is involved, and a specification
-that OpenSpec rejects makes the check exit non-zero.
+The same command is the OpenSpec entry in `mise run check`, in this repository and
+in a generated project (`mise run spec-check`). The two check sets differ in size —
+four tasks here, seven in a generated project — and this is one of each. No custom
+parser is involved, and a specification that OpenSpec rejects makes the check exit
+non-zero.
 
 Two native behaviors are worth knowing:
 

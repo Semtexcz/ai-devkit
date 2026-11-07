@@ -1,19 +1,41 @@
 # Roadmap
 
-This page reconciles the historical `v0.1` plan with the delivered v0.1.0
+This page reconciles the historical `v0.1` plan with the implemented v0.1.0
 baseline, and records the provisional milestones that follow it. The strategic
 target it serves is the [product vision](../vision.md).
 
 Read it as direction, not as approved scope:
 
-- M0 is delivered; only the claims recorded in the
+- M0 is implemented and its release preparation is complete; only the claims
+  recorded in the
   [v0.1.0 acceptance report](../releases/v0.1.0-acceptance-report.md) are
-  verified.
+  verified, and the `v0.1.0` tag is not yet published.
 - **Every milestone after M0 is a provisional proposal.** Naming a capability
   here does not authorize building it.
 - Actionable work is owned by OpenSpec. An approved change in `openspec/changes/`
   is the only authorization to implement anything, in any milestone.
 - Choosing whether to start a milestone is a human decision.
+- A roadmap item is never implementation authorization by itself. The human
+  approves consequential product scope and milestone implementation; small
+  documentation fixes, typo corrections and routine administrative maintenance
+  need no OpenSpec change unless they alter behavioral requirements or approved
+  scope. Never read a future milestone as permission to begin work.
+
+## Release status of v0.1.0
+
+v0.1.0 has three distinct states, and this page keeps them apart:
+
+- **Implemented and verified** — the v0.1 functionality exists in the repository,
+  and the claims recorded in the
+  [acceptance report](../releases/v0.1.0-acceptance-report.md) were verified on
+  the commits that report names.
+- **Release preparation complete** — the changelog, release notes, acceptance
+  report and toolchain pins for v0.1.0 are finished and reviewed.
+- **Publication pending** — the `v0.1.0` tag does not exist yet. Creating, moving
+  and pushing it is a human action, and no automated change may do it.
+
+This page therefore says *implemented* where functionality exists in the
+repository, and *published* only where a tag exists.
 
 ## How to read a milestone
 
@@ -28,7 +50,7 @@ Each milestone states the same five things:
 Acceptance criteria are gates, not promises. A milestone closes when its
 evidence exists, not when its narrative reads well.
 
-## Reconciliation: the historical plan and the delivered v0.1
+## Reconciliation: the historical plan and the implemented v0.1
 
 The `v0.1` plan ([historical implementation plan](ai-devkit-v0.1.md)) carried a
 dependency-ordered backlog of seven tasks. That backlog was the only roadmap this
@@ -36,13 +58,13 @@ project had, and it is now spent:
 
 | Historical task | State | Where it lives now |
 |---|---|---|
-| Task 1 — repository contract | delivered | `AGENTS.md`, `README.md`, `.gitignore`, ADR 0001 |
-| Task 2 — pinned toolchain and documentation verification | delivered | `mise.toml`, `mise.lock`, `.mise/locks/`, `pyproject.toml`, `uv.lock`, `mise run docs` |
-| Task 3 — native agent profiles | delivered as documentation and inert examples | `examples/agents/`, [agent configuration](../reference/agent-configuration.md) |
-| Task 4 — Python script overlay | delivered | `copier.yml`, `templates/python-script-overlay/template/`, `mise run test-template` |
-| Task 5 — OpenSpec vertical slice | delivered | `openspec/`, [OpenSpec reference](../reference/openspec.md) |
-| Task 6 — CI and update behavior | delivered | `.github/workflows/verify.yml`, `tests/`, [continuous integration](../reference/continuous-integration.md) |
-| Task 7 — clean-machine journey | delivered and recorded | [v0.1.0 acceptance report](../releases/v0.1.0-acceptance-report.md) |
+| Task 1 — repository contract | implemented | `AGENTS.md`, `README.md`, `.gitignore`, ADR 0001 |
+| Task 2 — pinned toolchain and documentation verification | implemented | `mise.toml`, `mise.lock`, `.mise/locks/`, `pyproject.toml`, `uv.lock`, `mise run docs` |
+| Task 3 — native agent profiles | implemented as documentation and inert examples | `examples/agents/`, [agent configuration](../reference/agent-configuration.md) |
+| Task 4 — Python script overlay | implemented | `copier.yml`, `templates/python-script-overlay/template/`, `mise run test-template` |
+| Task 5 — OpenSpec vertical slice | implemented | `openspec/`, [OpenSpec reference](../reference/openspec.md) |
+| Task 6 — CI and update behavior | implemented | `.github/workflows/verify.yml`, `tests/`, [continuous integration](../reference/continuous-integration.md) |
+| Task 7 — clean-machine journey | implemented and recorded | [v0.1.0 acceptance report](../releases/v0.1.0-acceptance-report.md) |
 
 The plan also listed deferred work. None of it disappeared; it moved to a
 milestone or was deliberately dropped as a design choice:
@@ -63,13 +85,16 @@ Python script project from a tagged overlay, give an agent native
 configuration, run one OpenSpec change end to end, and pass the same checks
 locally and in CI.
 
-**Baseline.** Implemented; see [v0.1.0 release notes](../releases/v0.1.0.md) and
-the [acceptance report](../releases/v0.1.0-acceptance-report.md).
+**Baseline.** Implemented and verified, with release preparation complete: the
+functionality exists, and the claims in the
+[v0.1.0 release notes](../releases/v0.1.0.md) and the
+[acceptance report](../releases/v0.1.0-acceptance-report.md) are verified on the
+commits that report names.
 
-**Gaps.** The release tag itself is a human action and does not exist yet. Linux
-x86-64 is the only verified platform. One profile exists. There is no
-orchestration, durable run state, messaging, dashboard or cost accounting, and
-none is claimed.
+**Gaps.** The `v0.1.0` tag does not exist yet. Publishing it is a human action, so
+the release is prepared but not published. Linux x86-64 is the only verified
+platform. One profile exists. There is no orchestration, durable run state,
+messaging, dashboard or cost accounting, and none is claimed.
 
 **Dependencies.** Human review of the acceptance report, a green hosted CI run on
 the tagged commit, and the human [tag publication](../releases/v0.1.0.md#publish-the-release-tag).
@@ -86,10 +111,10 @@ the same standards are reusable across real projects, an agent loads less
 irrelevant context, and the checks catch more before a review does.
 
 **Baseline.** v0.1 supplies `AGENTS.md`, one overlay, OpenSpec's generated
-skills, the six-check verification contract and a generation and update test. The
-`v0.1` plan already recorded a cost policy — implement bounded, stop after two
-failed repairs and hand the evidence on — as a documented rule rather than an
-engine.
+skills, the generated project's seven-check verification contract and a
+generation and update test. The `v0.1` plan already recorded a cost policy —
+implement bounded, stop after two failed repairs and hand the evidence on — as a
+documented rule rather than an engine.
 
 **Gaps.**
 - Skills are whatever OpenSpec generates; there are no devkit-owned reusable
@@ -162,16 +187,23 @@ open decisions.
 interfering with each other, and the human answers one consolidated question set
 rather than several, then accepts the delivered product as a whole.
 
-**Baseline.** M2 delivers single-change autonomy. Task decomposition already
-comes from OpenSpec change tasks, which carry dependencies.
+**Baseline.** M2 delivers single-change autonomy. OpenSpec owns the approved
+behavioral specifications and the change task checklists, and task decomposition
+comes from those change tasks. OpenSpec does not, by itself, provide an
+executable dependency graph or a scheduler.
 
-**Gaps.** No worktree isolation, no claim or lease over a task, no dependency-aware
-scheduling, no integration ordering, no CI-driven repair loop across branches, no
-question consolidation and no product-level acceptance demonstration.
+**Gaps.** No worktree isolation, no claim or lease over a task, no
+dependency-aware scheduling, no integration ordering, no CI-driven repair loop
+across branches, no question consolidation and no product-level acceptance
+demonstration. Dependency-aware scheduling is a responsibility of the
+orchestration runtime chosen for M2, not a capability OpenSpec supplies.
 
 **Dependencies.** M2 closed; a worktree and claim decision (Git native, or the
 orchestrator's); a merge policy that keeps the human merge as the approval
-boundary; conflict and integration evidence.
+boundary; conflict and integration evidence; and a demonstrated way to derive an
+executable order from OpenSpec task information. Any such integration must be
+evaluated and demonstrated against the pinned CLI, and it must not become a
+second authoritative task backlog.
 
 **Acceptance.** At least three independent changes delivered concurrently in
 separate worktrees with no cross-contamination; dependency order respected;
@@ -214,7 +246,7 @@ not add orchestration, and autonomy must never wait on them.
 
 | Profile | Outcome | Status |
 |---|---|---|
-| Unpackaged Python script | The v0.1 profile: entry point, one smoke test, lint, types, docs | Delivered |
+| Unpackaged Python script | The v0.1 profile: entry point, one smoke test, lint, types, docs | Implemented |
 | CLI application | A command surface with argument-parsing tests | Proposed; needs a real project |
 | Library | Packaging, import surface, API documentation and a release story | Proposed; needs a real project |
 | Backend service | HTTP surface with contract and integration tests | Proposed; needs a real project |
@@ -242,9 +274,16 @@ because the evidence exists and a human approves the next scope.
 | M3 → M4 | Parallel delivery produced verifiable integration evidence and no cross-contamination |
 | M4 | Unattended operation survived an interruption, a reboot, a restore and a budget stop |
 
-Any milestone may also be closed as *not worth it*, and that is a legitimate
-outcome. A cheaper, more reliable manual workflow that never becomes autonomous
-is a real alternative to a fragile orchestrator.
+Any milestone may also be paused, resequenced or reshaped when the evidence does
+not support it: a simpler implementation, a different order or a different tool
+may be the right answer, and that decision is legitimate. The strategic objective
+does not change with it. Highly autonomous software delivery remains the
+long-term objective, and the platform is judged by the human attention one
+accepted delivery requires. Which orchestrator, if any, carries it is not
+predetermined, and economic feasibility, reliability, safety and implementation
+scope stay subject to evidence. An approach that fails is revised — its
+implementation, its sequencing or its tool choice — rather than quietly treated
+as the end of the objective, and autonomy is never justified by ambition alone.
 
 ## What this page is not
 
@@ -254,6 +293,10 @@ is a real alternative to a fragile orchestrator.
   next to it.
 - It is **not an authorization**. A milestone description is not scope. Starting
   one requires an approved OpenSpec change and a human decision.
+- It is **not a scheduler**. OpenSpec owns approved behavioral specifications and
+  change task checklists; dependency-aware scheduling belongs to the future
+  orchestration runtime, and linking OpenSpec task information to executable
+  scheduling has to be evaluated and demonstrated, never assumed.
 - It is **not a commitment to build**. Where a maintained tool can carry a
   capability, adopting and configuring it beats implementing it.
 

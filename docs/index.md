@@ -68,7 +68,10 @@ every file and task it produces.
 Planning a change: [Plan, implement and archive one change](tutorials/spec-driven-change.md)
 runs one complete OpenSpec lifecycle, and the
 [OpenSpec reference](reference/openspec.md) lists every generated path, command and
-harness invocation.
+harness invocation. When the change moves from implementation to an independent
+reviewer and a repair agent, follow
+[Review and repair one change](how-to/review-and-repair-one-change.md), which names
+the minimum evidence each handoff carries and the human approval boundary.
 
 Updating a project and reading the pipeline: [Update a project's overlay](how-to/update-project-overlay.md)
 applies a native Copier update and resolves a conflict,

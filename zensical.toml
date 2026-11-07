@@ -23,6 +23,7 @@ nav = [
     { "Initialize OpenSpec in a project" = "how-to/initialize-openspec.md" },
     { "Validate changes and specifications" = "how-to/validate-openspec.md" },
     { "Configure coding agents" = "how-to/configure-coding-agents.md" },
+    { "Review and repair one change" = "how-to/review-and-repair-one-change.md" },
     { "Troubleshoot agent setup" = "how-to/troubleshoot-agent-setup.md" },
     { "Update a project's overlay" = "how-to/update-project-overlay.md" },
     { "Diagnose a failed CI job" = "how-to/diagnose-ci-failure.md" },

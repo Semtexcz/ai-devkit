@@ -11,6 +11,13 @@ only changelog.
 
 ### Added
 
+- An evidence-bound handoff procedure for one change.
+  [Review and repair one change](docs/how-to/review-and-repair-one-change.md) defines
+  the minimum implementation, independent review, bounded repair and final handoff
+  evidence, the two-attempt repair bound, and the human approval boundary. Bookvoice
+  PR #4 is recorded as one human-coordinated pilot, with repository and CI facts
+  separated from agent self-reports; it does not close M1.
+
 ### Changed
 
 ### Fixed

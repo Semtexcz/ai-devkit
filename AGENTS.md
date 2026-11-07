@@ -16,9 +16,26 @@ Portable: no host-specific paths, no required agent, model or provider. See
 - Load only the context the task needs; link to canonical documentation instead
   of copying it.
 
+## Product direction
+
+- The canonical product vision is [docs/vision.md](docs/vision.md) and the
+  canonical roadmap is [docs/plans/roadmap.md](docs/plans/roadmap.md). They own the
+  product mission, the target capabilities, the ownership boundaries and the
+  milestones; no other file restates them.
+- Every change must be architecturally consistent with the vision, including its
+  ownership table: one authoritative owner per concern, reuse before extension,
+  and no capability the vision assigns elsewhere. If a change would conflict with
+  the vision, stop and raise it with the human instead of widening scope quietly.
+- The roadmap records direction, not scope. **It does not authorize implementation
+  of any milestone after v0.1.** Starting a milestone is a human decision, and its
+  actionable scope is an approved OpenSpec change.
+- `docs/plans/ai-devkit-v0.1.md` is historical implementation documentation for
+  the delivered v0.1 baseline; it is not a live plan.
+
 ## Development workflow
 
-- Follow the [approved implementation plan](docs/plans/ai-devkit-v0.1.md).
+- Follow the [product vision](docs/vision.md) and the [roadmap](docs/plans/roadmap.md)
+  for direction, and implement only what is approved.
 - Keep changes limited to the current task.
 - OpenSpec owns behavioral requirements and change task lists. Specs live in
   `openspec/specs/`, proposed changes in `openspec/changes/`; both are written and
@@ -78,6 +95,9 @@ Portable: no host-specific paths, no required agent, model or provider. See
 - It must also never render `openspec/`, `.opencode/`, `.agents/` or `.clinerules/`:
   OpenSpec generates those in each project, and a template copy would be a second
   owner that drifts from the pinned CLI.
+- It must never render this repository's vision, roadmap or ADRs as project
+  content: a generated project owns its own direction, and shipping the devkit's
+  milestones into it would make provisional proposals look like project scope.
 - Copier provenance is `.copier-answers.yml`, rendered by the template. Never add a
   devkit-specific version table or a custom update command.
 - Do not add Copier tasks that execute commands, and do not patch application code

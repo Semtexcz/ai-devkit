@@ -11,6 +11,23 @@ only changelog.
 
 ### Added
 
+- A product vision and a reconciled roadmap.
+  [docs/vision.md](docs/vision.md) records the mission, the target autonomous
+  development lifecycle, the target capabilities, the human approval boundaries,
+  the ownership boundaries, the non-goals and the metrics that measure progress.
+  [docs/plans/roadmap.md](docs/plans/roadmap.md) reconciles the historical v0.1
+  backlog with what v0.1.0 delivers and records the provisional milestones after
+  it; those milestones are proposals, not approved scope, and OpenSpec remains the
+  only owner of actionable changes.
+- [docs/explanation/lessons-from-ai-project-template.md](docs/explanation/lessons-from-ai-project-template.md),
+  an evidence-based decision matrix recording what `ai-devkit` retains, adapts,
+  delegates, defers and rejects from `_ai_project_template`, with links pinned to
+  the reviewed commit.
+- `AGENTS.md` now points to the vision and the roadmap, requires architectural
+  consistency with the vision, states that the roadmap does not authorize
+  implementation of any milestone after v0.1, and forbids rendering the devkit's
+  vision, roadmap or ADRs into generated projects.
+
 ### Changed
 
 ### Fixed

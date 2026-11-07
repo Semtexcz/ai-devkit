@@ -1,6 +1,6 @@
 [project]
 site_name = "ai-devkit"
-site_description = "A portable, versioned development toolchain and engineering standards for small Python projects built with coding agents."
+site_description = "A portable, versioned integration platform and engineering standards for progressively autonomous software development."
 site_author = "ai-devkit maintainers"
 docs_dir = "docs"
 site_dir = "site"
@@ -11,6 +11,8 @@ strict = true
 
 nav = [
   { "Home" = "index.md" },
+  { "Vision" = "vision.md" },
+  { "Roadmap" = "plans/roadmap.md" },
   { "Tutorials" = [
     { "Getting started" = "tutorials/getting-started.md" },
     { "Create your first Python project" = "tutorials/first-python-project.md" },
@@ -38,9 +40,10 @@ nav = [
     { "Why verification and updates share one command" = "explanation/verification-and-updates.md" },
     { "OpenSpec, AGENTS.md and ADRs" = "explanation/openspec-and-agents.md" },
     { "Why agent configuration stays native" = "explanation/agent-independence.md" },
+    { "Lessons from _ai_project_template" = "explanation/lessons-from-ai-project-template.md" },
     { "ADR 0001: minimal configuration-first devkit" = "explanation/decisions/0001-minimal-devkit.md" },
     { "ADR 0002: script project overlay" = "explanation/decisions/0002-script-project-overlay.md" },
-    { "ai-devkit v0.1 implementation plan" = "plans/ai-devkit-v0.1.md" },
+    { "ai-devkit v0.1 implementation plan (historical)" = "plans/ai-devkit-v0.1.md" },
   ] },
   { "Releases" = [
     { "v0.1.0 release notes" = "releases/v0.1.0.md" },

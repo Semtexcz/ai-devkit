@@ -8,6 +8,12 @@ This site documents the repository itself: the pinned toolchain that makes the
 maintainer environment reproducible, and the standards that will be applied to
 generated Python projects.
 
+The target is autonomous software delivery, not merely more productive manual
+coding. Read the [product vision](vision.md) for the mission, the target
+lifecycle, the human approval boundaries and the non-goals, and the
+[roadmap](plans/roadmap.md) for what exists today and what is only a provisional
+proposal.
+
 ## Status
 
 Implemented and verified in this repository:
@@ -74,11 +80,19 @@ Repository records that are not tutorial content:
 
 - `AGENTS.md` (repository root) — engineering rules for people and coding
   agents.
+- [Product vision](vision.md) — the mission, the target autonomous lifecycle,
+  approval boundaries, ownership boundaries, non-goals and success measures.
+- [Roadmap](plans/roadmap.md) — the delivered v0.1 baseline and the provisional
+  milestones after it. Milestones after v0.1 are not approved scope.
+- [Lessons from `_ai_project_template`](explanation/lessons-from-ai-project-template.md)
+  — the decision matrix behind what was retained, adapted, delegated, deferred and
+  rejected.
 - [ADR 0001](explanation/decisions/0001-minimal-devkit.md) — why the devkit is
   configuration-first.
 - [ADR 0002](explanation/decisions/0002-script-project-overlay.md) — what the
   overlay may render and how provenance works.
-- [ai-devkit v0.1 plan](plans/ai-devkit-v0.1.md) — approved scope and backlog.
+- [Historical ai-devkit v0.1 implementation plan](plans/ai-devkit-v0.1.md) — the
+  implementation record for the delivered baseline; its backlog is spent.
 - `examples/agents/` — credential-free OpenCode and Codex configuration
   examples, inert until copied.
 - `examples/openspec-change/` — the worked example the tutorial and the integration

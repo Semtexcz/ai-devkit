@@ -16,10 +16,26 @@ agents who want reproducible toolchains and explicit standards.
 
 Custom code is the last resort.
 
+## Vision and roadmap
+
+The target is autonomous software delivery, not merely more productive manual
+coding: a person states a requirement, answers the questions that genuinely need
+a human, authorizes what carries real consequence, and accepts delivered software.
+
+- [docs/vision.md](docs/vision.md) — mission, the target autonomous lifecycle,
+  human approval boundaries, ownership boundaries, non-goals and how success is
+  measured.
+- [docs/plans/roadmap.md](docs/plans/roadmap.md) — the delivered v0.1 baseline and
+  the provisional milestones after it. Every milestone after v0.1 is a proposal,
+  not approved scope.
+- [docs/explanation/lessons-from-ai-project-template.md](docs/explanation/lessons-from-ai-project-template.md)
+  — what is retained, adapted, delegated, deferred or rejected from the earlier
+  `_ai_project_template`.
+
 ## Status
 
 Implemented and verified on Linux x86-64 (Tasks 1–6 of the
-[approved implementation plan](docs/plans/ai-devkit-v0.1.md)):
+[historical v0.1 implementation plan](docs/plans/ai-devkit-v0.1.md)):
 
 - an engineering contract in `AGENTS.md` and two architecture decision records;
 - a pinned toolchain: mise installs Python 3.13.18, Node.js 24.22.2, uv 0.13.7,
@@ -149,7 +165,9 @@ Packaging, publishing, containers, extra profiles and orchestration are deferred
 `ai-devkit` is independent of `_ai_project_template`: it keeps that project's
 emphasis on small slices, executable checks and explicit ownership, but replaces
 its policy resolver, context router and lifecycle with native configuration. No
-code is shared.
+code is shared. The
+[lessons page](docs/explanation/lessons-from-ai-project-template.md) records, per
+capability, what was retained, adapted, delegated, deferred or rejected.
 
 ## Documentation
 
@@ -177,9 +195,12 @@ The documentation site uses Diátaxis and is built with Zensical
 - [Why verification and updates share one command](docs/explanation/verification-and-updates.md) — one definition of correct, reviewed updates, independent files.
 - [OpenSpec, AGENTS.md and ADRs](docs/explanation/openspec-and-agents.md) — requirements, tasks, standards and rationale.
 - [Why agent configuration stays native](docs/explanation/agent-independence.md) — no router, separate billing paths.
+- [Product vision](docs/vision.md) — mission, target autonomous lifecycle, human approval boundaries, non-goals and success measures.
+- [Roadmap](docs/plans/roadmap.md) — the delivered v0.1 baseline and the provisional milestones after it; milestones after v0.1 are not approved scope.
+- [Lessons from `_ai_project_template`](docs/explanation/lessons-from-ai-project-template.md) — what was retained, adapted, delegated, deferred and rejected.
 - [ADR 0001](docs/explanation/decisions/0001-minimal-devkit.md) — design rationale.
 - [ADR 0002](docs/explanation/decisions/0002-script-project-overlay.md) — overlay scope and provenance.
-- [ai-devkit v0.1 plan](docs/plans/ai-devkit-v0.1.md) — scope and backlog.
+- [Historical ai-devkit v0.1 implementation plan](docs/plans/ai-devkit-v0.1.md) — the implementation record for the delivered baseline; its backlog is spent.
 - [v0.1.0 release notes](docs/releases/v0.1.0.md) — what v0.1 delivers, what it does not, and how the release tag is published.
 - [v0.1.0 acceptance report](docs/releases/v0.1.0-acceptance-report.md) — per-scenario evidence, environments and the user-provided live sessions.
 - [CHANGELOG.md](CHANGELOG.md) — notable changes, in Keep a Changelog form.

@@ -48,8 +48,10 @@ agent's summary.
   bound is two unsuccessful attempts, matching the policy already recorded in the
   roadmap and vision, after which the work escalates to a human.
 - **Approval attaches to a commit.** A repair creates a new head, so the final
-  handoff must cite the review and CI result for that exact commit. Approving a
-  branch generally would let an unreviewed commit travel with an old approval.
+  handoff must cite the review and CI result for that exact commit. The final review
+  is commit-bound with a clean working tree; reviewing uncommitted work is
+  preliminary only, because the base-to-head diff would omit it. Approving a branch
+  generally would let an unreviewed commit travel with an old approval.
 - **Ownership stays where the vision put it.** The how-to links to the vision
   rather than restating the approval table. A future orchestrator may coordinate
   the stages, but it must read and write these same sources and must not become a
@@ -69,7 +71,7 @@ agent's summary.
   OpenSpec and cite one real pilot; add another pilot before claiming the procedure
   is proven across projects.
 - [The procedure is mistaken for autonomous delivery] → State in the how-to and the
-  pilot record that a human coordinates every stage and performs the merge.
+  pilot record that a human coordinates every stage and owns the merge decision.
 
 ## Migration Plan
 

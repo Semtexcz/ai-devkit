@@ -9,10 +9,12 @@ implementation through independent review and bounded repair to human approval.
 
 ### Requirement: Implementation handoff precedes review
 
-Before requesting review, the implementer SHALL supply one handoff record naming
-the approved scope, repository and branch, exact base and head commits,
-working-tree state, changed files and exclusions, verification evidence, interface
-compatibility, release decision, known limitations and usage data.
+Before requesting final independent review, the implementer SHALL supply one
+handoff record naming the approved scope, repository and branch, exact base and head
+commits, working-tree state, changed files and exclusions, verification evidence,
+interface compatibility, release decision, known limitations and usage data. The
+working tree SHALL be clean and every in-scope change SHALL be committed in the
+named head, under the authorization the project specifies.
 
 #### Scenario: Complete record
 
@@ -24,10 +26,10 @@ compatibility, release decision, known limitations and usage data.
 - **WHEN** a check is reported in the handoff
 - **THEN** the record names the exact command and its result, and a check that did not run is listed as skipped with a reason and never as passed
 
-#### Scenario: Working tree state
+#### Scenario: Clean tree with committed scope
 
-- **WHEN** the head commit is handed over
-- **THEN** uncommitted or untracked paths are either absent or named as excluded from the reviewed scope
+- **WHEN** the head commit is handed to final independent review
+- **THEN** the working tree is clean and every in-scope change is contained in the named head commit
 
 #### Scenario: Interface and release decisions
 
@@ -41,20 +43,32 @@ compatibility, release decision, known limitations and usage data.
 
 ### Requirement: Review is independent and diff-based
 
-The reviewer SHALL judge the actual diff rather than the implementer's summary,
-read only context relevant to the changed behavior, reproduce important suspected
-defects when feasible, and report findings ordered by severity with file and line
-references.
+The reviewer SHALL judge the actual committed diff rather than the implementer's
+summary, read only context relevant to the changed behavior, reproduce important
+suspected defects when feasible, and report findings ordered by severity with file
+and line references or state `No findings` explicitly. The final independent review
+SHALL be bound to a commit and a clean working tree; a preliminary review of
+uncommitted changes SHALL NOT substitute for it.
 
 #### Scenario: Diff first
 
 - **WHEN** review starts
 - **THEN** the reviewer inspects the base-to-head diff and commit list before relying on the implementation summary
 
+#### Scenario: Commit-bound review
+
+- **WHEN** the final independent review begins
+- **THEN** the working tree is clean and the review covers the base-to-head committed diff
+
 #### Scenario: Actionable finding
 
 - **WHEN** the reviewer finds a defect
 - **THEN** the finding names its severity, file and line, observed and expected behavior, and reproduction evidence or why reproduction was not feasible
+
+#### Scenario: Clean review
+
+- **WHEN** the reviewer finds no defects
+- **THEN** the review states `No findings` explicitly before issuing APPROVE
 
 #### Scenario: Blocking findings are separated
 
@@ -142,6 +156,11 @@ or assertion SHALL NOT be presented as verification.
 
 - **WHEN** a claim is labelled verified
 - **THEN** it identifies the repository artifact or run that can be re-checked
+
+#### Scenario: Account actions
+
+- **WHEN** a claim about an account action is labelled verified
+- **THEN** it states only what the artifact establishes, such as the account that performed the action, not who operated the account or how the action was initiated
 
 #### Scenario: Workflow demonstrations
 

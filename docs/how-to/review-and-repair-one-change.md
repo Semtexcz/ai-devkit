@@ -30,7 +30,7 @@ handoff without reading the diff.
 | Approved scope | OpenSpec change name and path, or the project-owned scope, with a link to its proposal, spec and tasks |
 | Repository and branch | Repository identity and the branch under review |
 | Commits | Exact full base and head commit SHAs, not abbreviated or branch names |
-| Working tree | Clean, or every uncommitted and untracked path listed and marked in or out of scope |
+| Working tree | Clean: no uncommitted or untracked paths, and every in-scope change committed in the head |
 | Changed files and exclusions | Files that changed, and a short list of what the change deliberately does not touch |
 | Verification | Each exact command, its result, and every check skipped with the reason. A check that did not run is never reported as passed |
 | Compatibility | When a public interface changes: callers checked, whether existing implementations still satisfy the contract, and the migration or deprecation position |
@@ -42,6 +42,13 @@ Label every claim by provenance: `verified`, `self-reported` or `unavailable`. A
 verified claim names the commit, command output or CI run that establishes it. See
 [evidence labels](#evidence-labels).
 
+Committing requires whatever authorization the project specifies; an implementer
+does not commit on its own merely to satisfy this procedure. A reviewer may examine
+uncommitted changes as a preliminary review, but the final independent review is
+commit-bound: `git diff <base>..<head>` excludes uncommitted and untracked work, so
+the working tree must be clean and every in-scope change committed before that
+review starts.
+
 ## Handoff 2: review to repair
 
 The independent reviewer:
@@ -52,9 +59,9 @@ The independent reviewer:
    behavior. Broad repository reading is not required and is not evidence.
 3. Reproduces each important suspected defect when feasible. When it is not
    feasible, says so and explains what would have reproduced it.
-4. Reports findings ordered by severity. Each finding carries an identifier, a
-   severity, a `file:line` reference, the observed and expected behavior, and the
-   reproduction or supporting evidence.
+4. Reports findings ordered by severity, or states `No findings` explicitly. Each
+   finding carries an identifier, a severity, a `file:line` reference, the observed
+   and expected behavior, and the reproduction or supporting evidence.
 5. Separates blocking findings from non-blocking observations.
 6. Ends with exactly one verdict: `APPROVE` or `REQUEST CHANGES`. `APPROVE` is not
    issued while a blocking finding is unresolved.
@@ -69,7 +76,8 @@ Evidence: <command and result, or why reproduction was not feasible>
 ```
 
 The review record is the findings plus the verdict. A summary that hides the
-findings, or a verdict without findings, does not satisfy this handoff.
+findings does not satisfy this handoff. A clean review states `No findings` before
+`APPROVE`; a reported defect still carries the evidence above.
 
 ## Handoff 3: repair to review
 
@@ -133,8 +141,9 @@ implementation is the OpenSpec change
 
 The reported sequence was: DeepSeek implemented the bounded change; Codex found
 protocol-compatibility and release-metadata defects; DeepSeek repaired them; Codex
-approved the repair; GitHub CI passed; the human merged. The table separates what
-the repository and GitHub record from what only the agents reported.
+approved the repair; GitHub CI passed; the merge was recorded against the account
+`Semtexcz`. The table separates what the repository and GitHub record from what only
+the agents reported.
 
 | Claim | Status | Evidence |
 |---|---|---|
@@ -143,7 +152,8 @@ the repository and GitHub record from what only the agents reported.
 | DeepSeek repaired the findings | `self-reported` | Corroborated by commits `181a261` and `6454ca7`; the latter restores the legacy `dev` extra in `pyproject.toml` |
 | Codex approved the repair | `self-reported` | The PR body says "Independent Codex review approved the feature repairs"; GitHub records zero PR reviews and zero comments |
 | GitHub CI passed | `verified` | Four `test` check runs succeeded on head `6454ca7917bd55435d3f6cec7c980a3393e11add`; the last completed at 15:08:16Z, before the merge at 15:08:28Z |
-| A human performed the final merge | `verified` | GitHub records the account event `merged_by: Semtexcz`, merge commit `5b62c6beb8e64f297d80e391254e9904eddf199d`, base `2979ae7ce10e92ccd748750f64a1dcfd7fc0563d` and head `6454ca7917bd55435d3f6cec7c980a3393e11add`; Git cannot establish which person operated the account |
+| GitHub account `Semtexcz` performed the final merge | `verified` | GitHub records the account event `merged_by: Semtexcz`, merge commit `5b62c6beb8e64f297d80e391254e9904eddf199d`, base `2979ae7ce10e92ccd748750f64a1dcfd7fc0563d` and head `6454ca7917bd55435d3f6cec7c980a3393e11add`; GitHub verifies the account, not the person operating it |
+| A human manually initiated the merge | `self-reported` | The pilot's coordinator states it; no repository artifact separates a manual merge from an automated action by the account |
 | Model usage and cost | `unavailable` | No harness usage or cost record is stored in the repository or on the PR |
 
 This is one pilot with a human coordinating every stage. It is not evidence of
